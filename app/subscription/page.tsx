@@ -1,3 +1,4 @@
+"use client"
 import { TikTokSubscriptionPage } from "@/components/subs"
 import { useRouter } from "next/navigation"
 
