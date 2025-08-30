@@ -217,52 +217,52 @@ export function TikTokSubscriptionPage({
             </div>
           </div>
 
-          <nav className="space-y-2">
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <Home className="w-6 h-6" />
-              For You
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 text-left text-purple-500"
-              onClick={onNavigateToMain}
-            >
-              <Compass className="w-6 h-6" />
-              Explore
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <Users className="w-6 h-6" />
-              Following
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <Plus className="w-6 h-6" />
-              Upload
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <Radio className="w-6 h-6" />
-              LIVE
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
-              onClick={onNavigateToWallet}
-            >
-              <Wallet className="w-6 h-6" />
-              Wallet
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-purple-50 text-purple-500">
-              <CreditCard className="w-6 h-6" />
-              Subscription
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <User className="w-6 h-6" />
-              Profile
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <MoreHorizontal className="w-6 h-6" />
-              More
-            </Button>
-          </nav>
+                     <nav className="space-y-2">
+             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
+               <Home className="w-6 h-6" />
+               For You
+             </Button>
+             <Button 
+               variant="ghost" 
+               className="w-full justify-start gap-3 text-left text-purple-500"
+               onClick={onNavigateToMain}
+             >
+               <Compass className="w-6 h-6" />
+               Explore
+             </Button>
+             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
+               <Users className="w-6 h-6" />
+               Following
+             </Button>
+             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
+               <Plus className="w-6 h-6" />
+               Upload
+             </Button>
+             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
+               <Radio className="w-6 h-6" />
+               LIVE
+             </Button>
+             <Button 
+               variant="ghost" 
+               className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
+               onClick={onNavigateToWallet}
+             >
+               <Wallet className="w-6 h-6" />
+               Wallet
+             </Button>
+             <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-purple-50 text-purple-500">
+               <CreditCard className="w-6 h-6" />
+               Subscription
+             </Button>
+             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
+               <User className="w-6 h-6" />
+               Profile
+             </Button>
+             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
+               <MoreHorizontal className="w-6 h-6" />
+               More
+             </Button>
+           </nav>
 
           <div className="mt-8">
             <Button className="w-full bg-purple-500 hover:bg-purple-600 text-white">
@@ -286,17 +286,17 @@ export function TikTokSubscriptionPage({
         <main className="flex-1 p-4 md:p-6 space-y-6 lg:space-y-8 xl:pr-80">
           {/* Mobile Benefits Toggle */}
           <div className="xl:hidden">
-            <Button
-              variant="outline"
-              className="w-full justify-between"
-              onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
-            >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                Subscription Benefits
-              </span>
-              <span>{isBenefitsOpen ? "Hide" : "Show"}</span>
-            </Button>
+                         <Button
+               variant="outline"
+               className="w-full justify-between border-purple-200 hover:border-purple-300 hover:bg-purple-50"
+               onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
+             >
+               <span className="flex items-center gap-2">
+                 <Sparkles className="w-4 h-4 text-purple-500" />
+                 Subscription Benefits
+               </span>
+               <span>{isBenefitsOpen ? "Hide" : "Show"}</span>
+             </Button>
             
                          {isBenefitsOpen && (
                <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 space-y-4 shadow-md">
@@ -351,29 +351,29 @@ export function TikTokSubscriptionPage({
               </div>
             </div>
 
-          {/* Tab Navigation */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setActiveTab("overview")}
-                              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === "overview"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab("history")}
-                              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === "history"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-            >
-              History
-            </button>
-          </div>
+                     {/* Tab Navigation */}
+           <div className="flex bg-gray-100 rounded-lg p-1">
+             <button
+               onClick={() => setActiveTab("overview")}
+                               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                   activeTab === "overview"
+                     ? "bg-white text-purple-900 shadow-sm border border-purple-200"
+                     : "text-gray-600 hover:text-purple-700 hover:bg-purple-50"
+                 }`}
+             >
+               Overview
+             </button>
+             <button
+               onClick={() => setActiveTab("history")}
+                               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                   activeTab === "history"
+                     ? "bg-white text-purple-900 shadow-sm border border-purple-200"
+                     : "text-gray-600 hover:text-purple-700 hover:bg-purple-50"
+                 }`}
+             >
+               History
+             </button>
+           </div>
 
           {/* Tab Content */}
           {activeTab === "overview" ? (
@@ -403,21 +403,21 @@ export function TikTokSubscriptionPage({
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            {creator.hasGifts && (
-                              <Button size="sm" variant="outline" className="gap-2 bg-transparent border-gray-300 hover:bg-gray-50">
-                                <Gift className="w-4 h-4" />
-                                <span className="hidden sm:inline">Claim Gift</span>
-                              </Button>
-                            )}
-                            <Button size="sm" variant="outline" className="gap-2 relative bg-transparent border-gray-300 hover:bg-gray-50">
-                              <MessageSquare className="w-4 h-4" />
-                              <span className="hidden sm:inline">Chat</span>
-                                                              {creator.unreadMessages > 0 && (
-                                  <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 text-xs bg-red-500">
-                                    {creator.unreadMessages}
-                                  </Badge>
-                                )}
-                            </Button>
+                                                         {creator.hasGifts && (
+                               <Button size="sm" variant="outline" className="gap-2 bg-transparent border-purple-300 hover:bg-purple-50 hover:border-purple-400">
+                                 <Gift className="w-4 h-4 text-purple-500" />
+                                 <span className="hidden sm:inline">Claim Gift</span>
+                               </Button>
+                             )}
+                             <Button size="sm" variant="outline" className="gap-2 relative bg-transparent border-purple-300 hover:bg-purple-50 hover:border-purple-400">
+                               <MessageSquare className="w-4 h-4 text-purple-500" />
+                               <span className="hidden sm:inline">Chat</span>
+                                                               {creator.unreadMessages > 0 && (
+                                   <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 text-xs bg-purple-500">
+                                     {creator.unreadMessages}
+                                   </Badge>
+                                 )}
+                             </Button>
                           </div>
                         </div>
                       </CardHeader>
