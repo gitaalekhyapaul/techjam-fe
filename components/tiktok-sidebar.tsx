@@ -69,15 +69,15 @@ export function TikTokSidebar({
   const [searchQuery, setSearchQuery] = useState("")
 
   const defaultNavItems = [
-    { icon: Home, label: "For You", action: "main", isActive: activeView === "main" },
-    { icon: Compass, label: "Explore", action: "explore", isActive: activeView === "explore" },
-    { icon: Users, label: "Following", action: "following", isActive: activeView === "following" },
-    { icon: Plus, label: "Friends", action: "friends", isActive: activeView === "friends" },
-    { icon: Upload, label: "Upload", action: "upload", isActive: activeView === "upload" },
-    { icon: Radio, label: "LIVE", action: "live", isActive: activeView === "live" },
-    { icon: User, label: "Profile", action: "profile", isActive: activeView === "profile" },
-    { icon: Wallet, label: "Wallet", action: "wallet", isActive: activeView === "wallet" },
-    { icon: CreditCard, label: "Subscription", action: "subscription", isActive: activeView === "subscription" },
+    { icon: Home, label: "For You", action: "main", isActive: activeView === "main", hasNotification: false },
+    { icon: Compass, label: "Explore", action: "explore", isActive: activeView === "explore", hasNotification: false },
+    { icon: Users, label: "Following", action: "following", isActive: activeView === "following", hasNotification: false },
+    { icon: Plus, label: "Friends", action: "friends", isActive: activeView === "friends", hasNotification: false },
+    { icon: Upload, label: "Upload", action: "upload", isActive: activeView === "upload", hasNotification: false },
+    { icon: Radio, label: "LIVE", action: "live", isActive: activeView === "live", hasNotification: false },
+    { icon: User, label: "Profile", action: "profile", isActive: activeView === "profile", hasNotification: false },
+    { icon: Wallet, label: "Wallet", action: "wallet", isActive: activeView === "wallet", hasNotification: false },
+    { icon: CreditCard, label: "Subscription", action: "subscription", isActive: activeView === "subscription", hasNotification: false },
   ]
 
   const navItems = customNavItems || defaultNavItems
@@ -87,6 +87,11 @@ export function TikTokSidebar({
       onNavigate(action)
     } else {
       console.log(`Navigating to: ${action}`)
+    }
+    
+    // Close mobile sidebar after navigation
+    if (onToggleMobileSidebar) {
+      onToggleMobileSidebar()
     }
   }
 
@@ -185,7 +190,7 @@ export function TikTokSidebar({
               >
                 <item.icon className={`w-6 h-6 ${item.isActive ? "text-red-600" : "text-gray-600"}`} />
                 {!isCompact && <span className="font-medium">{item.label}</span>}
-                {item.hasNotification && !isCompact && (
+                {item.hasNotification === true && !isCompact && (
                   <div className="ml-auto w-2 h-2 bg-red-500 rounded-full"></div>
                 )}
               </Button>
