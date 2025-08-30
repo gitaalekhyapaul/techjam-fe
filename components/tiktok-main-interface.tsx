@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { TikTokMoreMenu } from "@/components/tiktok-more-menu"
 import { TikTokWalletPage } from "@/components/tiktok-wallet-page"
 import { TikTokVideoPlayer } from "@/components/tiktok-video-player"
+import { TikTokVideoFeed } from "@/components/tiktok-video-feed"
 import { TikTokLoginPage } from "@/components/tiktok-login-page"
 import { TikTokSubscriptionPage } from "@/components/subs"
 import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X, CreditCard, LogOut } from "lucide-react"
@@ -213,6 +214,7 @@ export function TikTokMainInterface() {
   const [currentView, setCurrentView] = useState<"main" | "more" | "wallet" | "login" | "subscription">("main")
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState<(typeof mockVideos)[0] | null>(null)
+  const [showVideoFeed, setShowVideoFeed] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState("")
 
@@ -246,8 +248,8 @@ export function TikTokMainInterface() {
     setIsMobileSidebarOpen(!isMobileSidebarOpen)
   }
 
-  const handleVideoClick = (video: (typeof mockVideos)[0]) => {
-    setSelectedVideo(video)
+  const handleVideoClick = () => {
+    setShowVideoFeed(true)
   }
 
   const handleCloseVideoPlayer = () => {
@@ -271,6 +273,17 @@ export function TikTokMainInterface() {
     setIsLoggedIn(false)
     setUsername("")
     setCurrentView("main")
+  }
+
+  if (showVideoFeed) {
+    return (
+      <TikTokVideoFeed
+        onBack={() => setShowVideoFeed(false)}
+        onNavigateToMain={handleBackToMain}
+        onNavigateToWallet={handleWalletClick}
+        onNavigateToSubscription={handleSubscriptionClick}
+      />
+    )
   }
 
   if (selectedVideo) {
@@ -391,7 +404,11 @@ export function TikTokMainInterface() {
           </div>
 
           <nav className="space-y-2">
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
+              onClick={() => setShowVideoFeed(true)}
+            >
               <Home className="w-6 h-6" />
               For You
             </Button>
@@ -476,9 +493,26 @@ export function TikTokMainInterface() {
         )}
 
         <main className="flex-1 p-4 md:p-6">
+          {/* Watch Videos Section */}
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome to TikTok</h1>
+            <p className="text-gray-600 mb-6">Discover amazing content from creators around the world</p>
+            <Button 
+              className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 text-lg rounded-full"
+              onClick={() => setShowVideoFeed(true)}
+            >
+              <Home className="w-5 h-5 mr-2" />
+              Watch Videos
+            </Button>
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Trending Videos</h2>
+          </div>
+          
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
             {mockVideos.map((video) => (
-              <div key={video.id} className="group cursor-pointer" onClick={() => handleVideoClick(video)}>
+                              <div key={video.id} className="group cursor-pointer" onClick={() => handleVideoClick()}>
                 <div className="relative aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden mb-2 md:mb-3">
                   <img
                     src={video.thumbnail || "/placeholder.svg"}
