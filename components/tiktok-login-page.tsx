@@ -21,8 +21,14 @@ export function TikTokLoginPage({ onBack, onLoginSuccess }: TikTokLoginPageProps
 
   // Valid credentials
   const validCredentials = {
-    username: "user123",
-    password: "1234"
+    user: {
+      username: "user123",
+      password: "1234"
+    },
+    creator: {
+      username: "Creator123",
+      password: "1234"
+    }
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -33,14 +39,23 @@ export function TikTokLoginPage({ onBack, onLoginSuccess }: TikTokLoginPageProps
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000))
 
-    if (username === validCredentials.username && password === validCredentials.password) {
-      // Store login state (in a real app, you'd store a JWT token)
+    // Check for creator login
+    if (username === validCredentials.creator.username && password === validCredentials.creator.password) {
+      // Store login state for creator
+      localStorage.setItem("isLoggedIn", "true")
+      localStorage.setItem("username", username)
+      localStorage.setItem("userType", "creator")
+      onLoginSuccess("creator")
+    }
+    // Check for regular user login
+    else if (username === validCredentials.user.username && password === validCredentials.user.password) {
+      // Store login state for regular user
       localStorage.setItem("isLoggedIn", "true")
       localStorage.setItem("username", username)
       localStorage.setItem("userType", "user")
-      onLoginSuccess()
+      onLoginSuccess("user")
     } else {
-      setError("Invalid username or password. Use user123 / 1234")
+      setError("Invalid username or password. Use user123/1234 or Creator123/1234")
     }
     
     setIsLoading(false)
@@ -82,7 +97,11 @@ export function TikTokLoginPage({ onBack, onLoginSuccess }: TikTokLoginPageProps
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-blue-700 text-sm">
               <strong>Demo Credentials:</strong><br />
+              <strong>Regular User:</strong><br />
               Username: <code className="bg-blue-100 px-1 rounded">user123</code><br />
+              Password: <code className="bg-blue-100 px-1 rounded">1234</code><br />
+              <strong>Creator:</strong><br />
+              Username: <code className="bg-blue-100 px-1 rounded">Creator123</code><br />
               Password: <code className="bg-blue-100 px-1 rounded">1234</code>
             </p>
           </div>

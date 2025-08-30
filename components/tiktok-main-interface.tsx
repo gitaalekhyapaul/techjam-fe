@@ -8,6 +8,8 @@ import { TikTokVideoPlayer } from "@/components/tiktok-video-player"
 import { TikTokVideoFeed } from "@/components/tiktok-video-feed"
 import { TikTokLoginPage } from "@/components/tiktok-login-page"
 import { TikTokSubscriptionPage } from "@/components/subs"
+import { TikTokCreatorDashboard } from "@/components/creator"
+import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X, CreditCard, LogOut } from "lucide-react"
 import { TikTokSidebar } from "@/components/tiktok-sidebar"
 import { Heart, Menu, Home, Search } from "lucide-react"
 
@@ -211,7 +213,7 @@ const categories = [
 
 export function TikTokMainInterface() {
   const [activeCategory, setActiveCategory] = useState("All")
-  const [currentView, setCurrentView] = useState<"main" | "wallet" | "login" | "subscription">("main")
+  const [currentView, setCurrentView] = useState<"main" | "more" | "wallet" | "login" | "subscription" | "creator">("main")
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState<(typeof mockVideos)[0] | null>(null)
   const [showVideoFeed, setShowVideoFeed] = useState(false)
@@ -228,7 +230,9 @@ export function TikTokMainInterface() {
     }
   }, [])
 
-
+  const handleMoreClick = () => {
+    setCurrentView("more")
+  }
 
   const handleBackToMain = () => {
     setCurrentView("main")
@@ -258,10 +262,16 @@ export function TikTokMainInterface() {
     setCurrentView("login")
   }
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (userType?: 'user' | 'creator') => {
     setIsLoggedIn(true)
     setUsername(localStorage.getItem("username") || "")
-    setCurrentView("main")
+    
+    // Redirect to creator dashboard if user is a creator
+    if (userType === 'creator') {
+      setCurrentView("creator")
+    } else {
+      setCurrentView("main")
+    }
   }
 
   const handleLogout = () => {
@@ -308,6 +318,10 @@ export function TikTokMainInterface() {
         onNavigateToWallet={handleWalletClick}
       />
     )
+  }
+
+  if (currentView === "creator") {
+    return <TikTokCreatorDashboard onLogout={handleLogout} />
   }
 
   return (
