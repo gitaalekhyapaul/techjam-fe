@@ -26,6 +26,10 @@ import {
   Lock,
   Menu,
   X,
+  Banknote,
+  Plus,
+  ArrowUpRight,
+  ArrowDownLeft,
 } from "lucide-react"
 
 // Simple UI Components (to avoid external dependencies)
@@ -236,11 +240,21 @@ const benefits = [
   { icon: Users2, text: "Access to Discord or private chats" },
 ]
 
+import { TikTokSidebar } from "../components/tiktok-sidebar"
+
 // Main Component
 export function TikTokSubscriptionPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isBenefitsOpen, setIsBenefitsOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("overview")
+
+  const recentTransactions = [
+    { id: 1, type: "received", description: "Payment from @charlidamelio", amount: 50.00, time: "1 hour ago" },
+    { id: 2, type: "sent", description: "Transfer to @addisonre", amount: 20.00, time: "2 hours ago" },
+    { id: 3, type: "received", description: "Payment from @zachking", amount: 100.00, time: "3 hours ago" },
+    { id: 4, type: "sent", description: "Transfer to @charlidamelio", amount: 10.00, time: "4 hours ago" },
+  ]
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -315,237 +329,265 @@ export function TikTokSubscriptionPage() {
       </header>
 
       <div className="flex pt-16 lg:pt-16">
-        {/* Mobile Sidebar Overlay */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-40 lg:hidden">
-            <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
-            <div className="absolute left-0 top-0 bottom-0 w-64 bg-background border-r border-border">
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <h2 className="font-semibold">Menu</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
-              <nav className="p-4 space-y-2">
-                {sidebarItems.map((item, index) => (
-                  <Button
-                    key={index}
-                    variant={item.active ? "default" : "ghost"}
-                    className={`w-full justify-start gap-3 ${
-                      item.active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                    {item.hasNotification && <Badge variant="destructive" className="ml-auto w-2 h-2 p-0">•</Badge>}
-                  </Button>
-                ))}
-              </nav>
-            </div>
-          </div>
-        )}
-
-        {/* Desktop Sidebar */}
-        <aside className="fixed left-0 top-16 bottom-0 w-64 bg-background border-r border-border overflow-y-auto hidden lg:block">
-          <nav className="p-4 space-y-2">
-            {sidebarItems.map((item, index) => (
-              <Button
-                key={index}
-                variant={item.active ? "default" : "ghost"}
-                className={`w-full justify-start gap-3 ${
-                  item.active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                }`}
-              >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
-                {item.hasNotification && <Badge variant="destructive" className="ml-auto w-2 h-2 p-0">•</Badge>}
-              </Button>
-            ))}
-          </nav>
-        </aside>
+        <TikTokSidebar
+          isLoggedIn={true}
+          isMobileSidebarOpen={isMobileMenuOpen}
+          onToggleMobileSidebar={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          activeView="subscription"
+          showMobileOverlay={true}
+          variant="default"
+          showSearch={false}
+          showLogo={false}
+          showFollowingSection={false}
+          showFooter={false}
+          customNavItems={sidebarItems.map(item => ({
+            icon: item.icon,
+            label: item.label,
+            action: item.label.toLowerCase().replace(/\s+/g, ''),
+            isActive: item.active,
+            hasNotification: item.hasNotification
+          }))}
+        />
 
         {/* Main Content */}
         <main className="flex-1 lg:ml-64 lg:mr-80 p-4 lg:p-6 space-y-6 lg:space-y-8">
           {/* Mobile Benefits Toggle */}
-          <div className="lg:hidden">
+          <div className="xl:hidden">
             <Button
               variant="outline"
-              className="w-full justify-between"
+              className="w-full justify-between border-red-200 hover:border-red-300 hover:bg-red-50"
               onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
             >
               <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-red-500" />
                 Subscription Benefits
               </span>
               <span>{isBenefitsOpen ? "Hide" : "Show"}</span>
             </Button>
             
             {isBenefitsOpen && (
-              <Card className="mt-4 bg-card border-border">
-                <CardContent className="p-4 space-y-4">
-                  {benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <benefit.icon className="w-5 h-5 text-primary" />
-                      <span className="text-sm">{benefit.text}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+              <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 space-y-4 shadow-md">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <benefit.icon className="w-5 h-5 text-red-500" />
+                    <span className="text-sm text-gray-800">{benefit.text}</span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Creators Section */}
-          <section>
-            <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">Creators (subscribed to)</h2>
-            <div className="space-y-4 lg:space-y-6">
-              {subscribedCreators.map((creator) => (
-                <Card key={creator.id} className="bg-card border-border">
-                  <CardHeader className="pb-4">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage src={creator.avatar || "/placeholder.svg"} />
-                          <AvatarFallback>{creator.name[1]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="font-semibold">{creator.name}</h3>
-                          <Badge
-                            variant={creator.supportLevel === "VIP" ? "default" : "secondary"}
-                            className={creator.supportLevel === "VIP" ? "bg-primary" : ""}
-                          >
-                            {creator.supportLevel === "VIP" && <Crown className="w-3 h-3 mr-1" />}
-                            {creator.supportLevel}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {creator.hasGifts && (
-                          <Button size="sm" variant="outline" className="gap-2 bg-transparent">
-                            <Gift className="w-4 h-4" />
-                            <span className="hidden sm:inline">Claim Gift</span>
-                          </Button>
-                        )}
-                        <Button size="sm" variant="outline" className="gap-2 relative bg-transparent">
-                          <MessageSquare className="w-4 h-4" />
-                          <span className="hidden sm:inline">Chat</span>
-                          {creator.unreadMessages > 0 && (
-                            <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 text-xs">
-                              {creator.unreadMessages}
-                            </Badge>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                      {creator.videos.map((video) => (
-                        <div key={video.id} className="flex-shrink-0 group cursor-pointer">
-                          <div className="relative">
-                            <img
-                              src={video.thumbnail || "/placeholder.svg"}
-                              alt={video.title}
-                              className="w-20 h-32 lg:w-24 lg:h-36 object-cover rounded-lg"
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                              <Lock className="w-4 h-4 text-white" />
+          {/* Wallet Balance Card */}
+          <div className="bg-gradient-to-br from-red-400 to-red-600 text-white border-0 rounded-lg p-6 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-white/80 text-sm font-medium">Available Balance</p>
+                <div className="flex items-center space-x-2">
+                  <p className="text-2xl font-bold">$127.50</p>
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <Banknote className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <Button className="flex-1 bg-white text-red-600 hover:bg-white/90">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Funds
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent"
+              >
+                <ArrowUpRight className="w-4 h-4 mr-2" />
+                Send
+              </Button>
+            </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === "overview"
+                  ? "bg-white text-red-900 shadow-sm border border-red-200"
+                  : "text-gray-600 hover:text-red-700 hover:bg-red-50"
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab("history")}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === "history"
+                  ? "bg-white text-red-900 shadow-sm border border-red-200"
+                  : "text-gray-600 hover:text-red-700 hover:bg-red-50"
+              }`}
+            >
+              History
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === "overview" ? (
+            <>
+              {/* Creators Section */}
+              <section>
+                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 text-gray-800">Creators (subscribed to)</h2>
+                <div className="space-y-4 lg:space-y-6">
+                  {subscribedCreators.map((creator) => (
+                    <div key={creator.id} className="bg-white border border-gray-200 rounded-lg shadow-md">
+                      <CardHeader className="pb-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage src={creator.avatar} />
+                              <AvatarFallback>{creator.name[1]}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h3 className="font-semibold">{creator.name}</h3>
+                              <Badge
+                                variant={creator.supportLevel === "VIP" ? "default" : "secondary"}
+                                className={creator.supportLevel === "VIP" ? "bg-red-500" : ""}
+                              >
+                                {creator.supportLevel === "VIP" && <Crown className="w-3 h-3 mr-1" />}
+                                {creator.supportLevel}
+                              </Badge>
                             </div>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1 w-20 lg:w-24 truncate">{video.title}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {creator.hasGifts && (
+                              <Button size="sm" variant="outline" className="gap-2 bg-transparent border-red-300 hover:bg-red-50 hover:border-red-400">
+                                <Gift className="w-4 h-4 text-red-500" />
+                                <span className="hidden sm:inline">Claim Gift</span>
+                              </Button>
+                            )}
+                            <Button size="sm" variant="outline" className="gap-2 relative bg-transparent border-red-300 hover:bg-red-50 hover:border-red-400">
+                              <MessageSquare className="w-4 h-4 text-red-500" />
+                              <span className="hidden sm:inline">Chat</span>
+                              {creator.unreadMessages > 0 && (
+                                <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 text-xs bg-red-500">
+                                  {creator.unreadMessages}
+                                </Badge>
+                              )}
+                            </Button>
+                          </div>
                         </div>
-                      ))}
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                          {creator.videos.map((video) => (
+                            <div key={video.id} className="flex-shrink-0 group cursor-pointer">
+                              <div className="relative">
+                                <img
+                                  src={video.thumbnail}
+                                  alt={video.title}
+                                  className="w-20 h-32 lg:w-24 lg:h-36 object-cover rounded-lg"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                  <Lock className="w-4 h-4 text-white" />
+                                </div>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1 w-20 lg:w-24 truncate">{video.title}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
+                  ))}
+                </div>
+              </section>
 
-          {/* New Section */}
-          <section>
-            <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">New</h2>
-            <div className="space-y-4">
-              {newUpdates.map((update) => (
-                <Card key={update.id} className="bg-card border-border">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={update.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>{update.creator[1]}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="font-semibold">{update.creator}</span>
-                          <span className="text-xs text-muted-foreground">{update.time}</span>
+              {/* New Section */}
+              <section>
+                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 text-gray-800">New</h2>
+                <div className="space-y-4">
+                  {newUpdates.map((update) => (
+                    <div key={update.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={update.avatar} />
+                          <AvatarFallback>{update.creator[1]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="font-semibold">{update.creator}</span>
+                            <span className="text-xs text-gray-500">{update.time}</span>
+                          </div>
+                          <p className="text-sm">{update.content}</p>
                         </div>
-                        <p className="text-sm">{update.content}</p>
+                        <Badge variant="outline" className="text-xs flex-shrink-0 border-gray-300">
+                          {update.type}
+                        </Badge>
                       </div>
-                      <Badge variant="outline" className="text-xs flex-shrink-0">
-                        {update.type}
-                      </Badge>
                     </div>
-                  </CardContent>
-                </Card>
+                  ))}
+                </div>
+              </section>
+            </>
+          ) : (
+            /* History Tab */
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
+              {recentTransactions.map((transaction) => (
+                <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        transaction.type === "received" ? "bg-green-100" : "bg-red-100"
+                      }`}>
+                        {transaction.type === "received" ? (
+                          <ArrowDownLeft className="w-5 h-5 text-green-600" />
+                        ) : (
+                          <ArrowUpRight className="w-5 h-5 text-red-600" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium">{transaction.description}</p>
+                        <p className="text-sm text-gray-500">{transaction.time}</p>
+                      </div>
+                    </div>
+                    <div className={`font-semibold ${
+                      transaction.type === "received" ? "text-green-600" : "text-red-600"
+                    }`}>
+                      {transaction.type === "received" ? "+" : "-"}${transaction.amount.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
-          </section>
+          )}
         </main>
 
         {/* Desktop Benefits Panel */}
-        <aside className="fixed right-0 top-16 bottom-0 w-80 bg-background border-l border-border p-6 hidden lg:block">
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                Subscription Benefits
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <aside className="fixed right-0 top-0 bottom-0 w-80 bg-white border-l border-gray-200 p-6 hidden xl:block">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-red-500" />
+              <h3 className="text-lg font-semibold text-gray-800">Subscription Benefits</h3>
+            </div>
+            <div className="space-y-4">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <benefit.icon className="w-5 h-5 text-primary" />
-                  <span className="text-sm">{benefit.text}</span>
+                  <benefit.icon className="w-5 h-5 text-red-500" />
+                  <span className="text-sm text-gray-800">{benefit.text}</span>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="mt-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="p-6 text-center">
-              <Crown className="w-8 h-8 text-primary mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Upgrade to VIP</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Get exclusive access to premium content and direct creator interactions
-              </p>
-              <Button className="w-full bg-primary hover:bg-primary/90">Upgrade Now</Button>
-            </CardContent>
-          </Card>
+          <div className="mt-6 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-lg p-6 text-center">
+            <Crown className="w-8 h-8 text-red-500 mx-auto mb-3" />
+            <h3 className="font-semibold mb-2 text-gray-800">Upgrade to VIP</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Get exclusive access to premium content and direct creator interactions
+            </p>
+            <Button className="w-full bg-red-500 hover:bg-red-600">Upgrade Now</Button>
+          </div>
         </aside>
       </div>
-
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border lg:hidden">
-        <div className="flex justify-around py-2">
-          {sidebarItems.slice(0, 5).map((item, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              size="sm"
-              className={`flex flex-col items-center gap-1 h-auto py-2 px-1 ${
-                item.active ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              <item.icon className="w-5 h-5" />
-              <span className="text-xs">{item.label}</span>
-            </Button>
-          ))}
-        </div>
-      </nav>
     </div>
   )
 }

@@ -14,59 +14,95 @@ import {
   Wallet, 
   CreditCard,
   LogOut,
-  X
+  X,
+  Menu,
+  Bell,
+  MoreHorizontal,
+  Upload
 } from "lucide-react"
 
 interface TikTokSidebarProps {
-  isLoggedIn: boolean
+  isLoggedIn?: boolean
   username?: string
-  onNavigate: (view: string) => void
-  onLogout: () => void
-  onLogin: () => void
-  isMobileSidebarOpen: boolean
-  onToggleMobileSidebar: () => void
+  onNavigate?: (view: string) => void
+  onLogout?: () => void
+  onLogin?: () => void
+  isMobileSidebarOpen?: boolean
+  onToggleMobileSidebar?: () => void
+  activeView?: string
+  showMobileOverlay?: boolean
+  variant?: "default" | "compact" | "full"
+  onBack?: () => void
+  showSearch?: boolean
+  searchPlaceholder?: string
+  showLogo?: boolean
+  showFollowingSection?: boolean
+  showFooter?: boolean
+  customNavItems?: Array<{
+    icon: any
+    label: string
+    action: string
+    isActive?: boolean
+    hasNotification?: boolean
+  }>
 }
 
 export function TikTokSidebar({
-  isLoggedIn,
+  isLoggedIn = false,
+  username,
   onNavigate,
   onLogout,
   onLogin,
-  isMobileSidebarOpen,
-  onToggleMobileSidebar
+  isMobileSidebarOpen = false,
+  onToggleMobileSidebar,
+  activeView = "main",
+  showMobileOverlay = true,
+  variant = "default",
+  onBack,
+  showSearch = true,
+  searchPlaceholder = "Search",
+  showLogo = true,
+  showFollowingSection = true,
+  showFooter = true,
+  customNavItems
 }: TikTokSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("")
 
-  const mainNavItems = [
-    { icon: Home, label: "For You", isActive: true, action: "main" },
-    { icon: Compass, label: "Explore", isActive: false, action: "explore" },
-    { icon: Users, label: "Following", isActive: false, action: "following" },
-    { icon: Plus, label: "Friends", isActive: false, action: "friends" },
-    { icon: Plus, label: "Upload", isActive: false, action: "upload" },
-    { icon: Radio, label: "LIVE", isActive: false, action: "live" },
-    { icon: User, label: "Profile", isActive: false, action: "profile" },
-    { icon: Wallet, label: "Wallet", isActive: false, action: "wallet" },
-    { icon: CreditCard, label: "Subscription", isActive: false, action: "subscription" },
-
+  const defaultNavItems = [
+    { icon: Home, label: "For You", action: "main", isActive: activeView === "main" },
+    { icon: Compass, label: "Explore", action: "explore", isActive: activeView === "explore" },
+    { icon: Users, label: "Following", action: "following", isActive: activeView === "following" },
+    { icon: Plus, label: "Friends", action: "friends", isActive: activeView === "friends" },
+    { icon: Upload, label: "Upload", action: "upload", isActive: activeView === "upload" },
+    { icon: Radio, label: "LIVE", action: "live", isActive: activeView === "live" },
+    { icon: User, label: "Profile", action: "profile", isActive: activeView === "profile" },
+    { icon: Wallet, label: "Wallet", action: "wallet", isActive: activeView === "wallet" },
+    { icon: CreditCard, label: "Subscription", action: "subscription", isActive: activeView === "subscription" },
   ]
 
+  const navItems = customNavItems || defaultNavItems
+
   const handleNavItemClick = (action: string) => {
-    if (action === "main") {
-      onNavigate("main")
-    } else if (action === "wallet") {
-      onNavigate("wallet")
-    } else if (action === "subscription") {
-      onNavigate("subscription")
+    if (onNavigate) {
+      onNavigate(action)
     } else {
-      // Handle other navigation items
       console.log(`Navigating to: ${action}`)
     }
   }
 
+  const handleBackClick = () => {
+    if (onBack) {
+      onBack()
+    }
+  }
+
+  const isCompact = variant === "compact"
+  const isFull = variant === "full"
+
   return (
     <>
       {/* Mobile Sidebar Overlay */}
-      {isMobileSidebarOpen && (
+      {showMobileOverlay && isMobileSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" 
           onClick={onToggleMobileSidebar} 
@@ -76,10 +112,12 @@ export function TikTokSidebar({
       {/* Sidebar */}
       <aside
         className={`
-          fixed md:static inset-y-0 left-0 z-50 w-64 min-h-screen bg-white border-r border-gray-200
+          fixed md:static inset-y-0 left-0 z-50 min-h-screen bg-white border-r border-gray-200
           transform transition-transform duration-300 ease-in-out
           ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
+          ${isCompact ? "w-16" : "w-64"}
+          ${isFull ? "w-80" : ""}
         `}
       >
         {/* Mobile Close Button */}
@@ -89,31 +127,44 @@ export function TikTokSidebar({
           </Button>
         </div>
 
-        {/* TikTok Logo */}
-        <div className="px-4 mb-6">
-          <img
-            src="/tiktok-official-logo.png"
-            alt="TikTok"
-            className="h-8 w-auto"
-          />
-        </div>
+        {/* Back Button (if provided) */}
+        {onBack && (
+          <div className="px-4 mb-4">
+            <Button variant="ghost" size="icon" onClick={handleBackClick}>
+              <X className="w-5 h-5 rotate-45" />
+            </Button>
+          </div>
+        )}
 
-        {/* Search Bar */}
-        <div className="px-4 mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input 
-              placeholder="tiru suara anwar ibrahim" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-gray-100 border-0 rounded-full text-sm text-gray-500" 
+        {/* TikTok Logo */}
+        {showLogo && (
+          <div className="px-4 mb-6">
+            <img
+              src="/tiktok-official-logo.png"
+              alt="TikTok"
+              className="h-8 w-auto"
             />
           </div>
-        </div>
+        )}
+
+        {/* Search Bar */}
+        {showSearch && (
+          <div className="px-4 mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input 
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-gray-100 border-0 rounded-full text-sm text-gray-500" 
+              />
+            </div>
+          </div>
+        )}
 
         {/* Main Navigation */}
         <nav className="px-4 space-y-1">
-          {mainNavItems.map((item, index) => {
+          {navItems.map((item, index) => {
             // Only show certain items when logged in
             if (!isLoggedIn && ["Wallet", "Subscription", "Profile"].includes(item.label)) {
               return null
@@ -133,46 +184,55 @@ export function TikTokSidebar({
                 onClick={() => handleNavItemClick(item.action)}
               >
                 <item.icon className={`w-6 h-6 ${item.isActive ? "text-red-600" : "text-gray-600"}`} />
-                <span className="font-medium">{item.label}</span>
+                {!isCompact && <span className="font-medium">{item.label}</span>}
+                {item.hasNotification && !isCompact && (
+                  <div className="ml-auto w-2 h-2 bg-red-500 rounded-full"></div>
+                )}
               </Button>
             )
           })}
         </nav>
 
         {/* Following Accounts Section */}
-        <div className="px-4 mt-8">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Following accounts</h3>
-          <p className="text-sm text-gray-500">Accounts you follow will appear here.</p>
-        </div>
+        {showFollowingSection && !isCompact && (
+          <div className="px-4 mt-8">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Following accounts</h3>
+            <p className="text-sm text-gray-500">Accounts you follow will appear here.</p>
+          </div>
+        )}
 
         {/* Login/Logout Section */}
-        <div className="px-4 mt-8">
-          {!isLoggedIn ? (
-            <Button 
-              className="w-full bg-red-500 hover:bg-red-600 text-white" 
-              onClick={onLogin}
-            >
-              Log in
-            </Button>
-          ) : (
-            <Button 
-              variant="outline" 
-              className="w-full text-gray-700 border-gray-300 hover:bg-gray-50" 
-              onClick={onLogout}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          )}
-        </div>
+        {!isCompact && (
+          <div className="px-4 mt-8">
+            {!isLoggedIn ? (
+              <Button 
+                className="w-full bg-red-500 hover:bg-red-600 text-white" 
+                onClick={onLogin}
+              >
+                Log in
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="w-full text-gray-700 border-gray-300 hover:bg-gray-50" 
+                onClick={onLogout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            )}
+          </div>
+        )}
 
         {/* Footer Links */}
-        <div className="px-4 mt-8 space-y-2 text-xs text-gray-500">
-          <div>Company</div>
-          <div>Programme</div>
-          <div>Terms & Policies</div>
-          <div className="mt-4">© 2025 TikTok</div>
-        </div>
+        {showFooter && !isCompact && (
+          <div className="px-4 mt-8 space-y-2 text-xs text-gray-500">
+            <div>Company</div>
+            <div>Programme</div>
+            <div>Terms & Policies</div>
+            <div className="mt-4">© 2025 TikTok</div>
+          </div>
+        )}
       </aside>
     </>
   )

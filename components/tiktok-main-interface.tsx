@@ -334,7 +334,7 @@ export function TikTokMainInterface() {
 
             <div className="flex items-center">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%203-jvuVYl6iGXvwtQ2TgRywoy9xheweks.png"
+                src="/tiktok-official-logo.png"
                 alt="TikTok Logo"
                 className="h-10 md:h-14 w-auto"
               />

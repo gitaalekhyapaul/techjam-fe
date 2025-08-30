@@ -32,7 +32,18 @@ import {
   HandHeart,
   Check,
   Menu,
+  Bell,
+  MoreHorizontal,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Banknote,
+  Eye,
+  EyeOff,
+  Filter,
+  SortAsc,
+  Edit
 } from "lucide-react"
+import { TikTokSidebar } from "./tiktok-sidebar"
 
 interface Transaction {
   id: string
@@ -60,6 +71,13 @@ interface Creator {
   verified: boolean
 }
 
+interface PaymentMethod {
+  id: string
+  type: string
+  name: string
+  icon: React.ReactNode
+}
+
 export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   const [balance] = useState(1247.5)
   const [subscriptionLevel] = useState("Premium")
@@ -67,6 +85,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   const [coinsUsed] = useState(8750)
   const [currentBoost] = useState(2.5)
   const [nextBoostAt] = useState(1500)
+  const [showBalance, setShowBalance] = useState(true)
 
   const [showAddFundsPopup, setShowAddFundsPopup] = useState(false)
   const [showCreatorSearch, setShowCreatorSearch] = useState(false)
@@ -158,151 +177,144 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
     { id: "1", recipient: "@sarah_dance", amount: 25.0, date: "2 hours ago", type: "sent" },
     { id: "2", recipient: "@mike_creator", amount: 15.0, date: "5 days ago", type: "received" },
     { id: "3", recipient: "@dance_queen", amount: 10.0, date: "1 week ago", type: "sent" },
+    { id: "4", recipient: "@comedy_king", amount: 30.0, date: "2 weeks ago", type: "sent" },
   ]
 
-  const paymentMethods = [
-    { id: "1", type: "Credit Card", name: "•••• 4242", icon: <CreditCard className="w-5 h-5" /> },
-    { id: "2", type: "Google Pay", name: "john@gmail.com", icon: <Smartphone className="w-5 h-5" /> },
-    { id: "3", type: "PayPal", name: "john@paypal.com", icon: <Building2 className="w-5 h-5" /> },
+  const paymentMethods: PaymentMethod[] = [
+    {
+      id: "1",
+      type: "Credit Card",
+      name: "Visa ending in 4242",
+      icon: <CreditCard className="w-5 h-5" />,
+    },
+    {
+      id: "2",
+      type: "Bank Account",
+      name: "Chase Bank ending in 1234",
+      icon: <Building2 className="w-5 h-5" />,
+    },
   ]
 
-  const boostProgress = (balance / nextBoostAt) * 100
+  const boostProgress = ((balance / nextBoostAt) * 100)
 
   const handleSubscriptionClick = () => {
     setCurrentView("subscription")
   }
 
-  const handleBackToWallet = () => {
-    setCurrentView("wallet")
-  }
-
-  const EditConfirmationDialog = ({ methodName, onConfirm, onCancel }: { methodName: string; onConfirm: () => void; onCancel: () => void }) => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
-      <div className="w-full max-w-sm">
-        <Card className="w-full bg-white border-0 shadow-2xl rounded-2xl">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-lg font-bold text-gray-900">Edit Payment Method</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6 pb-6">
-            <p className="text-center text-gray-600">
-              Are you sure you want to edit <span className="font-semibold">{methodName}</span>?
-            </p>
-            <div className="flex space-x-3">
-              <Button 
-                variant="outline" 
-                onClick={onCancel}
-                className="flex-1 border-gray-200 hover:bg-gray-50 text-gray-700"
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={onConfirm}
-                className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
-              >
-                Confirm
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+  // Creator Search Interface Component
+  const CreatorSearchInterface = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Send TikTok to Creator</h2>
+            <Button variant="ghost" size="icon" onClick={() => setShowCreatorSearch(false)}>
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search creators..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+        <div className="p-6 max-h-96 overflow-y-auto">
+          <div className="space-y-3">
+            {filteredCreators.map((creator) => (
+              <div key={creator.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                  {creator.verified && (
+                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Check className="w-2 h-2 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">{creator.displayName}</p>
+                  <p className="text-sm text-gray-500">{creator.username} • {creator.followers} followers</p>
+                </div>
+                <Button size="sm" onClick={() => setShowCreatorSearch(false)}>
+                  <Send className="w-4 h-4 mr-2" />
+                  Send
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
 
+  // Payment Methods Popup Component
   const PaymentMethodsPopup = ({ title, onClose }: { title: string; onClose: () => void }) => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4 overflow-y-auto">
-      <div className="w-full max-w-md my-8">
-        <Card className="w-full bg-white border-0 shadow-2xl rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 border-b border-gray-100">
-            <CardTitle className="text-xl font-bold text-gray-900">{title}</CardTitle>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-gray-100">
-              <X className="w-4 h-4 text-gray-600" />
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-md w-full">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">{title}</h2>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="w-5 h-5" />
             </Button>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-6 pb-8">
-            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
-              <CreditCard className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
-              <span className="text-base font-medium">Credit or Debit Card</span>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            <div className="space-y-3">
+              {paymentMethods.map((method) => (
+                <div key={method.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+                  {method.icon}
+                  <div className="flex-1">
+                    <p className="font-medium">{method.type}</p>
+                    <p className="text-sm text-gray-500">{method.name}</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button className="w-full">
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Payment Method
             </Button>
-            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
-              <Building2 className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
-              <span className="text-base font-medium">PayPal</span>
-            </Button>
-            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
-              <Smartphone className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
-              <span className="text-base font-medium">Google Pay</span>
-            </Button>
-            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
-              <Smartphone className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
-              <span className="text-base font-medium">Apple Pay</span>
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  // Edit Confirmation Dialog Component
+  const EditConfirmationDialog = ({ methodName, onConfirm, onCancel }: { methodName: string; onConfirm: () => void; onCancel: () => void }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <h3 className="text-lg font-bold mb-4">Edit {methodName}</h3>
+        <p className="text-gray-600 mb-6">Are you sure you want to edit this payment method?</p>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={onCancel} className="flex-1">
+            Cancel
+          </Button>
+          <Button onClick={onConfirm} className="flex-1">
+            Confirm
+          </Button>
+        </div>
       </div>
     </div>
   )
 
   if (currentView === "subscription") {
     return (
-      <TikTokSubscriptionPage 
-        onBack={handleBackToWallet}
-        onNavigateToMain={onBack}
-        onNavigateToWallet={handleBackToWallet}
+      <TikTokSubscriptionPage
+        onBack={() => setCurrentView("wallet")}
+        onNavigateToMain={() => setCurrentView("wallet")}
+        onNavigateToWallet={() => setCurrentView("wallet")}
       />
     )
   }
-
-  const CreatorSearchInterface = () => (
-    <div className="fixed inset-0 bg-gray-100 z-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 shadow-sm">
-        <div className="flex items-center gap-4 px-6 py-4">
-          <Button variant="ghost" size="icon" onClick={() => setShowCreatorSearch(false)} className="bg-pink-500 hover:bg-pink-600 text-white rounded-xl">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-bold text-gray-800">Send TikTok to Creators</h1>
-        </div>
-      </header>
-
-      <div className="p-6 space-y-6 bg-gray-100 min-h-screen">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <Input
-            placeholder="Search creators..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 text-base border-2 border-gray-200 focus:border-pink-300 rounded-xl shadow-sm"
-          />
-        </div>
-
-        <div className="space-y-4">
-          {filteredCreators.map((creator) => (
-            <Card key={creator.id} className="p-6 hover:shadow-md cursor-pointer transition-all duration-200 bg-white border border-gray-200 rounded-xl shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={creator.avatar || "/placeholder.svg"}
-                    alt={creator.displayName}
-                    className="w-14 h-14 rounded-full border-2 border-gray-100"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold text-lg text-gray-900">{creator.displayName}</p>
-                      {creator.verified && <Check className="w-5 h-5 text-blue-500" />}
-                    </div>
-                    <p className="text-base text-gray-600 mb-1">{creator.username}</p>
-                    <p className="text-sm text-gray-500">{creator.followers} followers</p>
-                  </div>
-                </div>
-                <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl shadow-sm">
-                  <Send className="w-5 h-5 mr-2" />
-                  Send
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -315,7 +327,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           <Button variant="ghost" size="icon" className="md:hidden text-gray-700" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             <Menu className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
               <Wallet className="w-6 h-6 text-white" />
             </div>
@@ -377,8 +389,22 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           <CardContent className="p-6 sm:p-8 relative">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <p className="text-white/80 text-sm font-medium">Total Balance</p>
-                <p className="text-4xl sm:text-5xl font-bold">${balance.toFixed(2)}</p>
+                <p className="text-white/80 text-sm font-medium">Available Balance</p>
+                <div className="flex items-center space-x-2">
+                  {showBalance ? (
+                    <p className="text-2xl font-bold">${balance.toFixed(2)}</p>
+                  ) : (
+                    <p className="text-2xl font-bold">••••••</p>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowBalance(!showBalance)}
+                    className="p-1 text-white hover:bg-white/20"
+                  >
+                    {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                </div>
               </div>
               <div className="flex items-center gap-2 bg-pink-300/30 rounded-full px-3 py-1.5">
                 <Star className="w-4 h-4" />
@@ -404,14 +430,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                 onClick={() => setShowCreatorSearch(true)}
               >
                 <Send className="w-4 h-4 mr-3" />
-                Send TikTok to creators
-              </Button>
-              <Button
-                className="bg-pink-500 hover:bg-pink-600 text-white w-full h-12 rounded-xl shadow-md"
-                onClick={() => setShowWithdrawPopup(true)}
-              >
-                <Download className="w-4 h-4 mr-3" />
-                Withdraw
+                Send
               </Button>
             </div>
           </CardContent>
@@ -548,31 +567,29 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                   Subscription
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto">
-                    <Crown className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{subscriptionLevel}</h3>
-                    <p className="text-sm text-gray-600">Active until Dec 30, 2025</p>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span>Priority video processing</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-blue-500" />
-                      <span>Advanced analytics</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-pink-500" />
-                      <span>Exclusive stickers & effects</span>
-                    </div>
-                  </div>
-                  <Button className="w-full" onClick={handleSubscriptionClick}>Manage Subscription</Button>
+              <CardContent className="text-center space-y-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto">
+                  <Crown className="w-8 h-8 text-white" />
                 </div>
+                <div>
+                  <h3 className="font-bold text-lg">{subscriptionLevel}</h3>
+                  <p className="text-sm text-gray-600">Active until Dec 30, 2025</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span>Priority video processing</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-blue-500" />
+                    <span>Advanced analytics</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Gift className="w-4 h-4 text-pink-500" />
+                    <span>Exclusive stickers & effects</span>
+                  </div>
+                </div>
+                <Button className="w-full" onClick={handleSubscriptionClick}>Manage Subscription</Button>
               </CardContent>
             </Card>
 
@@ -640,19 +657,15 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
+      {/* Popups and Modals */}
       {showAddFundsPopup && <PaymentMethodsPopup title="Add Funds" onClose={() => setShowAddFundsPopup(false)} />}
-
       {showWithdrawPopup && <PaymentMethodsPopup title="Withdraw Funds" onClose={() => setShowWithdrawPopup(false)} />}
-
       {showAddPaymentMethodPopup && <PaymentMethodsPopup title="Add Payment Method" onClose={() => setShowAddPaymentMethodPopup(false)} />}
-
       {showCreatorSearch && <CreatorSearchInterface />}
-
       {showEditConfirmation && editingMethod && (
         <EditConfirmationDialog
           methodName={editingMethod}
           onConfirm={() => {
-            // Handle the edit confirmation here
             console.log(`Editing ${editingMethod}`)
             setShowEditConfirmation(false)
             setEditingMethod(null)

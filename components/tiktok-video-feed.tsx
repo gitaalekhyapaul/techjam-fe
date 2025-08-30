@@ -494,41 +494,42 @@ export function TikTokVideoFeed({
       {/* Main Video Player Area */}
       <main className="flex-1 relative bg-black" onWheel={handleWheel} ref={videoContainerRef}>
         {/* Top Header */}
-        <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4">
-          <div className="flex items-center">
+        <header className="absolute top-0 left-0 right-0 z-[9999] flex items-center justify-between p-4 bg-black/20 backdrop-blur-sm">
+          <div className="flex items-center gap-2">
             <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%203-jvuVYl6iGXvwtQ2TgRywoy1.png"
+              src="/tiktok-logo-bw.png"
               alt="TikTok Logo"
-              className="h-8 w-auto"
+              className="h-12 w-auto drop-shadow-lg"
+              style={{ minWidth: '60px' }}
             />
           </div>
 
-                     <div className="flex items-center gap-4">
-             <Button variant="ghost" className="text-white hover:bg-white/20">
-               <div className="flex items-center gap-2">
-                 <div className="w-5 h-5 bg-yellow-500 rounded-full"></div>
-                 Get Coins
-               </div>
-             </Button>
-             <Button variant="ghost" className="text-white hover:bg-white/20">
-               <div className="flex items-center gap-2">
-                 <div className="w-5 h-5 bg-gray-600 rounded-full"></div>
-                 Get App
-               </div>
-             </Button>
-                                         <div className="flex items-center gap-2 text-white">
-                <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-yellow-800" fill="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <span className="text-sm font-medium">0</span>
+          <div className="flex items-center">
+            <Button variant="ghost" className="text-white hover:bg-white/20">
+              <div className="flex items-center gap-1">
+                <div className="w-5 h-5 bg-yellow-500 rounded-full"></div>
+                <span className="text-white">Get Coins</span>
               </div>
-             <Avatar className="w-8 h-8">
-               <AvatarFallback className="bg-green-500 text-white text-sm">J</AvatarFallback>
-             </Avatar>
-           </div>
+            </Button>
+            <Button variant="ghost" className="text-white hover:bg-white/20">
+              <div className="flex items-center gap-1">
+                <div className="w-5 h-5 bg-gray-600 rounded-full"></div>
+                <span className="text-white">Get App</span>
+              </div>
+            </Button>
+            <div className="flex items-center gap-1 text-white">
+              <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-yellow-800" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium">0</span>
+            </div>
+            <Avatar className="w-8 h-8 gap-2">
+              <AvatarFallback className="bg-green-500 text-white text-sm">J</AvatarFallback>
+            </Avatar>
+          </div>
         </header>
 
         {/* Video Content */}

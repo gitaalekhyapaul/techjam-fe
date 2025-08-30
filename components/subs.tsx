@@ -1,40 +1,43 @@
 "use client"
 
-import React, { useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
-import {
-  Home,
-  Compass,
-  Users,
-  Radio,
-  User,
-  MoreHorizontal,
-  Wallet,
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { 
+  Search, 
+  Home, 
+  Compass, 
+  Users, 
+  Plus, 
+  Radio, 
+  User, 
+  Wallet, 
   CreditCard,
-  Search,
-  MessageSquare,
+  MoreHorizontal,
+  X,
+  Menu,
+  Bell,
+  Heart,
+  MessageCircle,
   Gift,
   Crown,
-  Sparkles,
-  Calendar,
+  Star,
+  TrendingUp,
   Users2,
-  Lock,
-  Menu,
-  X,
+  Zap,
+  Calendar,
+  Clock,
   Eye,
-  EyeOff,
-  Plus,
-  ArrowUpRight,
-  ArrowDownLeft,
-  ArrowLeft,
-  Banknote,
-
+  Play,
+  Share2,
+  Bookmark,
+  Filter,
+  SortAsc
 } from "lucide-react"
+import { TikTokSidebar } from "./tiktok-sidebar"
 
 
 
@@ -108,7 +111,7 @@ const newUpdates = [
 ]
 
 const benefits = [
-  { icon: Sparkles, text: "Bonus content" },
+  { icon: TrendingUp, text: "Bonus content" },
   { icon: Gift, text: "Gifts for top supporters" },
   { icon: Calendar, text: "Entry for private TikTok events" },
   { icon: Users2, text: "Access to Discord or private chats" },
@@ -131,21 +134,27 @@ export function TikTokSubscriptionPage({
 }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isBenefitsOpen, setIsBenefitsOpen] = useState(false)
-  const [showBalance, setShowBalance] = useState(true)
-  const [activeTab, setActiveTab] = useState<"overview" | "history">("overview")
+
+  const handleNavigate = (view: string) => {
+    if (view === "main" && onNavigateToMain) {
+      onNavigateToMain()
+    } else if (view === "wallet" && onNavigateToWallet) {
+      onNavigateToWallet()
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-4 md:px-6 py-3">
-          <div className="flex items-center gap-4 md:gap-8">
-            {onBack && (
-              <Button variant="ghost" size="icon" onClick={onBack} className="text-gray-700">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            )}
-            <Button variant="ghost" size="icon" className="md:hidden text-gray-700" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 md:hidden">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-gray-700"
+            >
               <Menu className="w-5 h-5" />
             </Button>
 
@@ -165,358 +174,308 @@ export function TikTokSubscriptionPage({
             <Button variant="ghost" size="icon" className="hidden sm:flex text-gray-700">
               <MoreHorizontal className="w-5 h-5" />
             </Button>
-                         <Button className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-6 py-2 rounded text-sm">
-               Log in
-             </Button>
+            <Button className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-6 py-2 rounded text-sm">
+              Log in
+            </Button>
           </div>
         </div>
       </header>
 
       <div className="flex relative">
-        <aside
-          className={`
-          fixed md:static inset-y-0 left-0 z-50 w-64 min-h-screen p-4 bg-white border-r border-gray-200
-          transform transition-transform duration-300 ease-in-out
-          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
-        >
-          <div className="flex justify-end mb-4 md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700">
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
+        <TikTokSidebar
+          isLoggedIn={false}
+          isMobileSidebarOpen={isMobileMenuOpen}
+          onToggleMobileSidebar={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          activeView="subscription"
+          onNavigate={handleNavigate}
+          onBack={onBack}
+          showMobileOverlay={true}
+          variant="default"
+          showSearch={true}
+          searchPlaceholder="Search creators and content"
+          showLogo={true}
+          showFollowingSection={false}
+          showFooter={false}
+        />
 
-          <div className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input 
-                placeholder="Search" 
-                className="pl-10 bg-gray-100 border-0 rounded-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+        {/* Main Content */}
+        <main className="flex-1 lg:ml-64 p-4 md:p-6 space-y-6">
+          {/* Header Section */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Creator Subscriptions</h1>
+                <p className="text-gray-600">Support your favorite creators and get exclusive content</p>
+              </div>
+              <Button className="bg-red-500 hover:bg-red-600 text-white">
+                <Plus className="w-4 h-4 mr-2" />
+                Subscribe to Creator
+              </Button>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-gradient-to-br from-pink-50 to-red-50 rounded-lg">
+                <div className="text-2xl font-bold text-red-600">12</div>
+                <div className="text-sm text-gray-600">Active Subscriptions</div>
+              </div>
+              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">$89.99</div>
+                <div className="text-sm text-gray-600">Monthly Spending</div>
+              </div>
+              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-600">156</div>
+                <div className="text-sm text-gray-600">Exclusive Videos</div>
+              </div>
+              <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">24</div>
+                <div className="text-sm text-gray-600">Live Streams</div>
+              </div>
             </div>
           </div>
 
-                     <nav className="space-y-2">
-                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
-                <Home className="w-6 h-6" />
-                For You
-              </Button>
-                           <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 text-left text-red-500"
-                onClick={onNavigateToMain}
-              >
-                <Compass className="w-6 h-6" />
-                Explore
-              </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
-                <Users className="w-6 h-6" />
-                Following
-              </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
-                <Plus className="w-6 h-6" />
-                Upload
-              </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
-                <Radio className="w-6 h-6" />
-                LIVE
-              </Button>
-                           <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
-                onClick={onNavigateToWallet}
-              >
-                <Wallet className="w-6 h-6" />
-                Wallet
-              </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-red-50 text-red-500">
-                <CreditCard className="w-6 h-6" />
-                Subscription
-              </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
-                <User className="w-6 h-6" />
-                Profile
-              </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
-                <MoreHorizontal className="w-6 h-6" />
-                More
-              </Button>
-           </nav>
-
-                     <div className="mt-8">
-             <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
-               Log in
-             </Button>
-           </div>
-
-          <div className="mt-8 space-y-2 text-xs text-gray-500">
-            <div>Company</div>
-            <div>Programme</div>
-            <div>Terms & Policies</div>
-            <div className="mt-4">© 2025 TikTok</div>
-          </div>
-        </aside>
-
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
-        )}
-
-        {/* Main Content */}
-        <main className="flex-1 p-4 md:p-6 space-y-6 lg:space-y-8 xl:pr-80">
-          {/* Mobile Benefits Toggle */}
-          <div className="xl:hidden">
-                                                   <Button
-                variant="outline"
-                className="w-full justify-between border-red-200 hover:border-red-300 hover:bg-red-50"
-                onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
-              >
-                <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-red-500" />
-                  Subscription Benefits
-                </span>
-                <span>{isBenefitsOpen ? "Hide" : "Show"}</span>
-              </Button>
-            
-                         {isBenefitsOpen && (
-               <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 space-y-4 shadow-md">
-                 {benefits.map((benefit, index) => (
-                   <div key={index} className="flex items-center gap-3">
-                     <benefit.icon className="w-5 h-5 text-red-500" />
-                     <span className="text-sm text-gray-800">{benefit.text}</span>
-                   </div>
-                 ))}
-               </div>
-             )}
-          </div>
-
-                     {/* Wallet Balance Card */}
-           <div className="bg-gradient-to-br from-red-400 to-red-600 text-white border-0 rounded-lg p-6 shadow-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-white/80 text-sm">Available Balance</p>
-                  <div className="flex items-center space-x-2">
-                    {showBalance ? (
-                      <p className="text-2xl font-bold">$127.50</p>
-                    ) : (
-                      <p className="text-2xl font-bold">••••••</p>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowBalance(!showBalance)}
-                      className="p-1 text-white hover:bg-white/20"
-                    >
-                      {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </Button>
-                  </div>
-                </div>
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <Banknote className="w-6 h-6" />
+          {/* Search and Filter */}
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input 
+                    placeholder="Search creators..." 
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
               </div>
-
-              <div className="flex space-x-3">
-                                 <Button className="flex-1 bg-white text-red-600 hover:bg-white/90">
-                   <Plus className="w-4 h-4 mr-2" />
-                   Add Funds
-                 </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent"
-                >
-                  <ArrowUpRight className="w-4 h-4 mr-2" />
-                  Send
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm">
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filter
+                </Button>
+                <Button variant="outline" size="sm">
+                  <SortAsc className="w-4 h-4 mr-2" />
+                  Sort
                 </Button>
               </div>
             </div>
+          </div>
 
-                     {/* Tab Navigation */}
-           <div className="flex bg-gray-100 rounded-lg p-1">
-             <button
-               onClick={() => setActiveTab("overview")}
-                               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                   activeTab === "overview"
-                     ? "bg-white text-red-900 shadow-sm border border-red-200"
-                     : "text-gray-600 hover:text-red-700 hover:bg-red-50"
-                 }`}
-             >
-               Overview
-             </button>
-             <button
-               onClick={() => setActiveTab("history")}
-                               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                   activeTab === "history"
-                     ? "bg-white text-red-900 shadow-sm border border-red-200"
-                     : "text-gray-600 hover:text-red-700 hover:bg-red-50"
-                 }`}
-             >
-               History
-             </button>
-           </div>
-
-          {/* Tab Content */}
-          {activeTab === "overview" ? (
-            <>
-              {/* Creators Section */}
-              <section>
-                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 text-gray-800">Creators (subscribed to)</h2>
-                                 <div className="space-y-4 lg:space-y-6">
-                   {subscribedCreators.map((creator) => (
-                     <div key={creator.id} className="bg-white border border-gray-200 rounded-lg shadow-md">
-                      <CardHeader className="pb-4">
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="w-12 h-12">
-                              <AvatarImage src={creator.avatar} />
-                              <AvatarFallback>{creator.name[1]}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <h3 className="font-semibold">{creator.name}</h3>
-                                                                                                                          <Badge
-                                 variant={creator.supportLevel === "VIP" ? "default" : "secondary"}
-                                 className={creator.supportLevel === "VIP" ? "bg-red-500" : ""}
-                               >
-                                 {creator.supportLevel === "VIP" && <Crown className="w-3 h-3 mr-1" />}
-                                 {creator.supportLevel}
-                               </Badge>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                                                                                                                   {creator.hasGifts && (
-                                <Button size="sm" variant="outline" className="gap-2 bg-transparent border-red-300 hover:bg-red-50 hover:border-red-400">
-                                  <Gift className="w-4 h-4 text-red-500" />
-                                  <span className="hidden sm:inline">Claim Gift</span>
-                                </Button>
-                              )}
-                              <Button size="sm" variant="outline" className="gap-2 relative bg-transparent border-red-300 hover:bg-red-50 hover:border-red-400">
-                                <MessageSquare className="w-4 h-4 text-red-500" />
-                                <span className="hidden sm:inline">Chat</span>
-                                                                {creator.unreadMessages > 0 && (
-                                    <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 text-xs bg-red-500">
-                                      {creator.unreadMessages}
-                                    </Badge>
-                                  )}
-                              </Button>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                          {creator.videos.map((video) => (
-                            <div key={video.id} className="flex-shrink-0 group cursor-pointer">
-                              <div className="relative">
-                                <img
-                                  src={video.thumbnail}
-                                  alt={video.title}
-                                  className="w-20 h-32 lg:w-24 lg:h-36 object-cover rounded-lg"
-                                />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                                  <Lock className="w-4 h-4 text-white" />
-                                </div>
-                              </div>
-                              <p className="text-xs text-gray-500 mt-1 w-20 lg:w-24 truncate">{video.title}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </div>
-                  ))}
+          {/* Subscribed Creators Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Creator Card 1 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <img 
+                  src="/dance-content.png" 
+                  alt="Creator" 
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute top-2 right-2">
+                  <Badge variant="secondary" className="bg-white/90 text-gray-800">
+                    <Crown className="w-3 h-3 mr-1" />
+                    Premium
+                  </Badge>
                 </div>
-              </section>
-
-              {/* New Section */}
-              <section>
-                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 text-gray-800">New</h2>
-                <div className="space-y-4">
-                                     {newUpdates.map((update) => (
-                     <div key={update.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
-                      <div className="flex items-start gap-3">
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={update.avatar} />
-                          <AvatarFallback>{update.creator[1]}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className="font-semibold">{update.creator}</span>
-                            <span className="text-xs text-gray-500">{update.time}</span>
-                          </div>
-                          <p className="text-sm">{update.content}</p>
-                        </div>
-                                                  <Badge variant="outline" className="text-xs flex-shrink-0 border-gray-300">
-                            {update.type}
-                          </Badge>
-                      </div>
-                    </div>
-                  ))}
+                <div className="absolute bottom-2 left-2">
+                  <Badge variant="destructive" className="bg-red-500 text-white">
+                    $9.99/month
+                  </Badge>
                 </div>
-              </section>
-            </>
-          ) : (
-            /* History Tab */
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
-                             {recentTransactions.map((transaction) => (
-                 <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        transaction.type === "received" ? "bg-green-100" : "bg-red-100"
-                      }`}>
-                        {transaction.type === "received" ? (
-                          <ArrowDownLeft className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <ArrowUpRight className="w-5 h-5 text-red-600" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium">{transaction.description}</p>
-                        <p className="text-sm text-gray-500">{transaction.time}</p>
-                      </div>
-                    </div>
-                    <div className={`font-semibold ${
-                      transaction.type === "received" ? "text-green-600" : "text-red-600"
-                    }`}>
-                      {transaction.type === "received" ? "+" : "-"}${transaction.amount.toFixed(2)}
-                    </div>
+              </div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src="/diverse-group-smiling.png" />
+                    <AvatarFallback>CD</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">@charlidamelio</CardTitle>
+                    <CardDescription>Dance & Lifestyle Creator</CardDescription>
                   </div>
                 </div>
-              ))}
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Followers</span>
+                  <span className="font-semibold">148.2M</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Exclusive Videos</span>
+                  <span className="font-semibold">23</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Next Live</span>
+                  <span className="font-semibold text-red-500">Tomorrow 8PM</span>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Message
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Heart className="w-4 h-4 mr-2" />
+                    Gift
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Creator Card 2 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <img 
+                  src="/beauty-content.png" 
+                  alt="Creator" 
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute top-2 right-2">
+                  <Badge variant="secondary" className="bg-white/90 text-gray-800">
+                    <Star className="w-3 h-3 mr-1" />
+                    Standard
+                  </Badge>
+                </div>
+                <div className="absolute bottom-2 left-2">
+                  <Badge variant="secondary" className="bg-gray-500 text-white">
+                    $4.99/month
+                  </Badge>
+                </div>
+              </div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src="/portrait-young-woman.png" />
+                    <AvatarFallback>AR</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">@addisonre</CardTitle>
+                    <CardDescription>Beauty & Fashion Creator</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Followers</span>
+                  <span className="font-semibold">89.7M</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Exclusive Videos</span>
+                  <span className="font-semibold">15</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Next Live</span>
+                  <span className="font-semibold text-gray-500">Friday 7PM</span>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Message
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Heart className="w-4 h-4 mr-2" />
+                    Gift
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Creator Card 3 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <img 
+                  src="/comedy-content.png" 
+                  alt="Creator" 
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute top-2 right-2">
+                  <Badge variant="secondary" className="bg-white/90 text-gray-800">
+                    <Crown className="w-3 h-3 mr-1" />
+                    VIP
+                  </Badge>
+                </div>
+                <div className="absolute bottom-2 left-2">
+                  <Badge variant="destructive" className="bg-red-500 text-white">
+                    $19.99/month
+                  </Badge>
+                </div>
+              </div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src="/diverse-group-meeting.png" />
+                    <AvatarFallback>ZK</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">@zachking</CardTitle>
+                    <CardDescription>Magic & Comedy Creator</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Followers</span>
+                  <span className="font-semibold">67.3M</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Exclusive Videos</span>
+                  <span className="font-semibold">31</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Next Live</span>
+                  <span className="font-semibold text-red-500">Tonight 9PM</span>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Message
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Heart className="w-4 h-4 mr-2" />
+                    Gift
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-red-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Gift sent to @charlidamelio</p>
+                  <p className="text-xs text-gray-500">2 hours ago</p>
+                </div>
+                <Badge variant="outline">$5.00</Badge>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Play className="w-5 h-5 text-blue-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Watched exclusive video from @addisonre</p>
+                  <p className="text-xs text-gray-500">5 hours ago</p>
+                </div>
+                <Badge variant="secondary">New</Badge>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-green-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Subscription renewed for @zachking</p>
+                  <p className="text-xs text-gray-500">1 day ago</p>
+                </div>
+                <Badge variant="outline">$19.99</Badge>
+              </div>
             </div>
-          )}
+          </div>
         </main>
-
-        {/* Desktop Benefits Panel */}
-        <aside className="fixed right-0 top-0 bottom-0 w-80 bg-white border-l border-gray-200 p-6 hidden xl:block">
-                     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
-             <div className="flex items-center gap-2 mb-4">
-               <Sparkles className="w-5 h-5 text-red-500" />
-               <h3 className="text-lg font-semibold text-gray-800">Subscription Benefits</h3>
-             </div>
-             <div className="space-y-4">
-               {benefits.map((benefit, index) => (
-                 <div key={index} className="flex items-center gap-3">
-                   <benefit.icon className="w-5 h-5 text-red-500" />
-                   <span className="text-sm text-gray-800">{benefit.text}</span>
-                 </div>
-               ))}
-             </div>
-           </div>
-
-                     <div className="mt-6 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-lg p-6 text-center">
-             <Crown className="w-8 h-8 text-red-500 mx-auto mb-3" />
-             <h3 className="font-semibold mb-2 text-gray-800">Upgrade to VIP</h3>
-             <p className="text-sm text-gray-600 mb-4">
-               Get exclusive access to premium content and direct creator interactions
-             </p>
-             <Button className="w-full bg-red-500 hover:bg-red-600">Upgrade Now</Button>
-           </div>
-        </aside>
       </div>
-
-
     </div>
   )
 }
