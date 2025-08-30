@@ -70,6 +70,8 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   const [showAddFundsPopup, setShowAddFundsPopup] = useState(false)
   const [showCreatorSearch, setShowCreatorSearch] = useState(false)
   const [showWithdrawPopup, setShowWithdrawPopup] = useState(false)
+  const [showEditConfirmation, setShowEditConfirmation] = useState(false)
+  const [editingMethod, setEditingMethod] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [currentView, setCurrentView] = useState<"wallet" | "subscription">("wallet")
 
@@ -163,6 +165,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
 
   const boostProgress = (balance / nextBoostAt) * 100
 
+<<<<<<< Updated upstream
   const handleSubscriptionClick = () => {
     setCurrentView("subscription")
   }
@@ -171,32 +174,64 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
     setCurrentView("wallet")
   }
 
+  const EditConfirmationDialog = ({ methodName, onConfirm, onCancel }: { methodName: string; onConfirm: () => void; onCancel: () => void }) => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
+      <div className="w-full max-w-sm">
+        <Card className="w-full bg-white border-0 shadow-2xl rounded-2xl">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-lg font-bold text-gray-900">Edit Payment Method</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 pb-6">
+            <p className="text-center text-gray-600">
+              Are you sure you want to edit <span className="font-semibold">{methodName}</span>?
+            </p>
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                onClick={onCancel}
+                className="flex-1 border-gray-200 hover:bg-gray-50 text-gray-700"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={onConfirm}
+                className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
+              >
+                Confirm
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+
   const PaymentMethodsPopup = ({ title, onClose }: { title: string; onClose: () => void }) => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4 overflow-y-auto">
       <div className="w-full max-w-md my-8">
-        <Card className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
-              <X className="w-4 h-4" />
+        <Card className="w-full bg-white border-0 shadow-2xl rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 border-b border-gray-100">
+            <CardTitle className="text-xl font-bold text-gray-900">{title}</CardTitle>
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-gray-100">
+              <X className="w-4 h-4 text-gray-600" />
             </Button>
           </CardHeader>
-          <CardContent className="space-y-3 pb-6">
-            <Button className="w-full justify-start h-12 text-left bg-transparent" variant="outline">
-              <CreditCard className="w-5 h-5 mr-3 flex-shrink-0" />
-              <span>Credit or Debit Card</span>
+          <CardContent className="space-y-4 pt-6 pb-8">
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <CreditCard className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">Credit or Debit Card</span>
             </Button>
-            <Button className="w-full justify-start h-12 text-left bg-transparent" variant="outline">
-              <Building2 className="w-5 h-5 mr-3 flex-shrink-0" />
-              <span>PayPal</span>
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <Building2 className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">PayPal</span>
             </Button>
-            <Button className="w-full justify-start h-12 text-left bg-transparent" variant="outline">
-              <Smartphone className="w-5 h-5 mr-3 flex-shrink-0" />
-              <span>Google Pay</span>
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <Smartphone className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">Google Pay</span>
             </Button>
-            <Button className="w-full justify-start h-12 text-left bg-transparent" variant="outline">
-              <Smartphone className="w-5 h-5 mr-3 flex-shrink-0" />
-              <span>Apple Pay</span>
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <Smartphone className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">Apple Pay</span>
             </Button>
           </CardContent>
         </Card>
@@ -215,48 +250,48 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   }
 
   const CreatorSearchInterface = () => (
-    <div className="fixed inset-0 bg-background z-50">
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0">
+    <div className="fixed inset-0 bg-gray-100 z-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 shadow-sm">
         <div className="flex items-center gap-4 px-6 py-4">
-          <Button variant="ghost" size="icon" onClick={() => setShowCreatorSearch(false)}>
+          <Button variant="ghost" size="icon" onClick={() => setShowCreatorSearch(false)} className="bg-pink-500 hover:bg-pink-600 text-white rounded-xl">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-bold">Send TikTok to Creators</h1>
+          <h1 className="text-xl font-bold text-gray-800">Send TikTok to Creators</h1>
         </div>
       </header>
 
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 bg-gray-100 min-h-screen">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             placeholder="Search creators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-12 h-12 text-base border-2 border-gray-200 focus:border-pink-300 rounded-xl shadow-sm"
           />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredCreators.map((creator) => (
-            <Card key={creator.id} className="p-4 hover:bg-muted/50 cursor-pointer transition-colors">
+            <Card key={creator.id} className="p-6 hover:shadow-md cursor-pointer transition-all duration-200 bg-white border border-gray-200 rounded-xl shadow-sm">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <img
                     src={creator.avatar || "/placeholder.svg"}
                     alt={creator.displayName}
-                    className="w-12 h-12 rounded-full"
+                    className="w-14 h-14 rounded-full border-2 border-gray-100"
                   />
                   <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">{creator.displayName}</p>
-                      {creator.verified && <Check className="w-4 h-4 text-blue-500" />}
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold text-lg text-gray-900">{creator.displayName}</p>
+                      {creator.verified && <Check className="w-5 h-5 text-blue-500" />}
                     </div>
-                    <p className="text-sm text-muted-foreground">{creator.username}</p>
-                    <p className="text-xs text-muted-foreground">{creator.followers} followers</p>
+                    <p className="text-base text-gray-600 mb-1">{creator.username}</p>
+                    <p className="text-sm text-gray-500">{creator.followers} followers</p>
                   </div>
                 </div>
-                <Button size="sm">
-                  <Send className="w-4 h-4 mr-2" />
+                <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl shadow-sm">
+                  <Send className="w-5 h-5 mr-2" />
                   Send
                 </Button>
               </div>
@@ -268,20 +303,20 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   )
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-4 px-6 py-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button variant="ghost" size="icon" onClick={onBack} className="text-gray-700">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
-              <Wallet className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
+              <Wallet className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">TikTok Wallet</h1>
-              <p className="text-sm text-muted-foreground">Manage your digital currency</p>
+              <h1 className="text-xl font-bold text-gray-800">TikTok Wallet</h1>
+              <p className="text-sm text-gray-600">Manage your digital currency</p>
             </div>
           </div>
         </div>
@@ -289,42 +324,46 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
 
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         {/* Balance Section */}
-        <Card className="bg-gradient-to-br from-primary to-secondary text-white border-0 overflow-hidden relative">
+        <Card className="bg-gradient-to-br from-pink-400 to-pink-600 text-white border-0 overflow-hidden relative shadow-lg">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12" />
-          <CardContent className="p-4 sm:p-8 relative">
-            <div className="flex items-center justify-between mb-6">
+          <CardContent className="p-6 sm:p-8 relative">
+            <div className="flex items-center justify-between mb-8">
               <div>
                 <p className="text-white/80 text-sm font-medium">Total Balance</p>
-                <p className="text-3xl sm:text-4xl font-bold">${balance.toFixed(2)}</p>
+                <p className="text-4xl sm:text-5xl font-bold">${balance.toFixed(2)}</p>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1">
-                <Sparkles className="w-4 h-4" />
-                <span className="text-sm font-medium">{subscriptionLevel}</span>
+              <div className="flex items-center gap-2 bg-pink-300/30 rounded-full px-3 py-1.5">
+                <Star className="w-4 h-4" />
+                <span className="text-sm font-medium">Premium</span>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
+            
+            {/* Add Funds Button - Large white button */}
+            <div className="mb-6">
               <Button
-                className="bg-white text-primary hover:bg-white/90 flex-1 h-11"
+                className="bg-white text-gray-900 hover:bg-white/90 w-full h-14 text-lg font-semibold rounded-xl shadow-md"
                 onClick={() => setShowAddFundsPopup(true)}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-5 h-5 mr-3 text-red-500" />
                 Add Funds
               </Button>
+            </div>
+            
+            {/* Action Buttons - Two pink buttons below */}
+            <div className="space-y-3">
               <Button
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 flex-1 bg-transparent h-11"
+                className="bg-pink-500 hover:bg-pink-600 text-white w-full h-12 rounded-xl shadow-md"
                 onClick={() => setShowCreatorSearch(true)}
               >
-                <Send className="w-4 h-4 mr-2" />
+                <Send className="w-4 h-4 mr-3" />
                 Send TikTok to creators
               </Button>
               <Button
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 flex-1 bg-transparent h-11"
+                className="bg-pink-500 hover:bg-pink-600 text-white w-full h-12 rounded-xl shadow-md"
                 onClick={() => setShowWithdrawPopup(true)}
               >
-                <Download className="w-4 h-4 mr-2" />
+                <Download className="w-4 h-4 mr-3" />
                 Withdraw
               </Button>
             </div>
@@ -335,7 +374,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
             {/* Payment Methods */}
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="w-5 h-5" />
@@ -346,21 +385,28 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                 {paymentMethods.map((method) => (
                   <div
                     key={method.id}
-                    className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white"
                   >
                     <div className="flex items-center gap-3">
                       {method.icon}
                       <div>
                         <p className="font-medium">{method.type}</p>
-                        <p className="text-sm text-muted-foreground">{method.name}</p>
+                        <p className="text-sm text-gray-600">{method.name}</p>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setEditingMethod(method.type)
+                        setShowEditConfirmation(true)
+                      }}
+                    >
                       Edit
                     </Button>
                   </div>
                 ))}
-                <Button variant="outline" className="w-full mt-3 bg-transparent">
+                <Button variant="outline" className="w-full mt-3 bg-white border-gray-200 hover:bg-gray-50">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Payment Method
                 </Button>
@@ -368,7 +414,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
             </Card>
 
             {/* Transaction History */}
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-md">
               <CardHeader>
                 <CardTitle>Recent Transactions</CardTitle>
               </CardHeader>
@@ -377,7 +423,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                   {transactions.map((transaction) => (
                     <div
                       key={transaction.id}
-                      className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors"
+                      className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors bg-white border border-gray-100"
                     >
                       <div className="flex items-center gap-3">
                         <div
@@ -389,7 +435,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                         </div>
                         <div>
                           <p className="font-medium">{transaction.description}</p>
-                          <p className="text-sm text-muted-foreground">{transaction.date}</p>
+                          <p className="text-sm text-gray-600">{transaction.date}</p>
                         </div>
                       </div>
                       <p className={`font-bold ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}>
@@ -402,7 +448,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
             </Card>
 
             {/* Gifting History */}
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Gift className="w-5 h-5" />
@@ -414,7 +460,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                   {giftHistory.map((gift) => (
                     <div
                       key={gift.id}
-                      className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors"
+                      className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors bg-white border border-gray-100"
                     >
                       <div className="flex items-center gap-3">
                         <div
@@ -428,7 +474,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                           <p className="font-medium">
                             {gift.type === "sent" ? `Sent to ${gift.recipient}` : `Received from ${gift.recipient}`}
                           </p>
-                          <p className="text-sm text-muted-foreground">{gift.date}</p>
+                          <p className="text-sm text-gray-600">{gift.date}</p>
                         </div>
                       </div>
                       <p className={`font-bold ${gift.type === "received" ? "text-green-600" : "text-blue-600"}`}>
@@ -444,7 +490,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Subscription Level */}
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Crown className="w-5 h-5 text-yellow-500" />
@@ -458,7 +504,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">{subscriptionLevel}</h3>
-                    <p className="text-sm text-muted-foreground">Active until Dec 30, 2025</p>
+                    <p className="text-sm text-gray-600">Active until Dec 30, 2025</p>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
@@ -480,7 +526,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
             </Card>
 
             {/* Boosts */}
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-green-500" />
@@ -490,7 +536,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
               <CardContent className="space-y-4">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-primary">{currentBoost}x</p>
-                  <p className="text-sm text-muted-foreground">Current multiplier</p>
+                  <p className="text-sm text-gray-600">Current multiplier</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -501,14 +547,14 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                   </div>
                   <Progress value={boostProgress} className="h-2" />
                 </div>
-                <p className="text-xs text-muted-foreground text-center">
+                <p className="text-xs text-gray-600 text-center">
                   Spend ${(nextBoostAt - balance).toFixed(0)} more to unlock 3x boost!
                 </p>
               </CardContent>
             </Card>
 
             {/* Gamified Elements */}
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-yellow-500" />
@@ -517,22 +563,22 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <Coins className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
                     <p className="text-lg font-bold">{coinsUsed.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">Coins Used</p>
+                    <p className="text-xs text-gray-600">Coins Used</p>
                   </div>
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <HandHeart className="w-6 h-6 text-purple-500 mx-auto mb-1" />
                     <p className="text-lg font-bold">{clapsReceived.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">Claps Supported</p>
+                    <p className="text-xs text-gray-600">Claps Supported</p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Badge variant="secondary" className="w-full justify-center py-2">
+                  <Badge variant="secondary" className="w-full justify-center py-2 bg-gray-100 text-gray-800 border-gray-200">
                     🎉 Lucky Draw Available!
                   </Badge>
-                  <Button variant="outline" className="w-full bg-transparent">
+                  <Button variant="outline" className="w-full bg-white border-gray-200 hover:bg-gray-50">
                     <Sparkles className="w-4 h-4 mr-2" />
                     Spin for Rewards
                   </Button>
@@ -548,6 +594,22 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
       {showWithdrawPopup && <PaymentMethodsPopup title="Withdraw Funds" onClose={() => setShowWithdrawPopup(false)} />}
 
       {showCreatorSearch && <CreatorSearchInterface />}
+
+      {showEditConfirmation && editingMethod && (
+        <EditConfirmationDialog
+          methodName={editingMethod}
+          onConfirm={() => {
+            // Handle the edit confirmation here
+            console.log(`Editing ${editingMethod}`)
+            setShowEditConfirmation(false)
+            setEditingMethod(null)
+          }}
+          onCancel={() => {
+            setShowEditConfirmation(false)
+            setEditingMethod(null)
+          }}
+        />
+      )}
     </div>
   )
 }
