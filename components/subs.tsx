@@ -137,7 +137,15 @@ const recentTransactions = [
   { id: 3, type: "received", amount: 50.0, description: "Added funds", time: "3 days ago" },
 ]
 
-export function TikTokSubscriptionPage() {
+export function TikTokSubscriptionPage({ 
+  onBack, 
+  onNavigateToMain, 
+  onNavigateToWallet 
+}: { 
+  onBack?: () => void
+  onNavigateToMain?: () => void
+  onNavigateToWallet?: () => void
+}) {
   const [searchQuery, setSearchQuery] = useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isBenefitsOpen, setIsBenefitsOpen] = useState(false)
@@ -149,6 +157,11 @@ export function TikTokSubscriptionPage() {
       <header className="border-b border-gray-200">
         <div className="flex items-center justify-between px-4 md:px-6 py-3">
           <div className="flex items-center gap-4 md:gap-8">
+            {onBack && (
+              <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
+                <X className="w-5 h-5" />
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               <Menu className="w-5 h-5" />
             </Button>
@@ -208,7 +221,11 @@ export function TikTokSubscriptionPage() {
               <Home className="w-6 h-6" />
               For You
             </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left text-red-500">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start gap-3 text-left text-red-500"
+              onClick={onNavigateToMain}
+            >
               <Compass className="w-6 h-6" />
               Explore
             </Button>
@@ -224,7 +241,11 @@ export function TikTokSubscriptionPage() {
               <Radio className="w-6 h-6" />
               LIVE
             </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
+              onClick={onNavigateToWallet}
+            >
               <Wallet className="w-6 h-6" />
               Wallet
             </Button>

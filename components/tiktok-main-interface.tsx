@@ -7,7 +7,8 @@ import { TikTokMoreMenu } from "@/components/tiktok-more-menu"
 import { TikTokWalletPage } from "@/components/tiktok-wallet-page"
 import { TikTokVideoPlayer } from "@/components/tiktok-video-player"
 import { TikTokLoginPage } from "@/components/tiktok-login-page"
-import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X } from "lucide-react"
+import { TikTokSubscriptionPage } from "@/components/subs"
+import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X, CreditCard } from "lucide-react"
 
 const mockVideos = [
   {
@@ -210,7 +211,7 @@ const categories = [
 export function TikTokMainInterface() {
   const [isWalletOpen, setIsWalletOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState("All")
-  const [currentView, setCurrentView] = useState<"main" | "more" | "wallet" | "login">("main")
+  const [currentView, setCurrentView] = useState<"main" | "more" | "wallet" | "login" | "subscription">("main")
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState<(typeof mockVideos)[0] | null>(null)
 
@@ -224,6 +225,10 @@ export function TikTokMainInterface() {
 
   const handleWalletClick = () => {
     setCurrentView("wallet")
+  }
+
+  const handleSubscriptionClick = () => {
+    setCurrentView("subscription")
   }
 
   const toggleMobileSidebar = () => {
@@ -260,6 +265,16 @@ export function TikTokMainInterface() {
 
   if (currentView === "login") {
     return <TikTokLoginPage onBack={handleBackToMain} />
+  }
+
+  if (currentView === "subscription") {
+    return (
+      <TikTokSubscriptionPage 
+        onBack={handleBackToMain}
+        onNavigateToMain={handleBackToMain}
+        onNavigateToWallet={handleWalletClick}
+      />
+    )
   }
 
   return (
@@ -365,6 +380,15 @@ export function TikTokMainInterface() {
             >
               <Wallet className="w-6 h-6" />
               Wallet
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
+              onClick={handleSubscriptionClick}
+            >
+              <CreditCard className="w-6 h-6" />
+              Subscription
             </Button>
 
             <Button variant="ghost" className="w-full justify-start gap-3 text-left">

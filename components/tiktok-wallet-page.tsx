@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { TikTokSubscriptionPage } from "@/components/subs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -70,6 +71,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   const [showCreatorSearch, setShowCreatorSearch] = useState(false)
   const [showWithdrawPopup, setShowWithdrawPopup] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [currentView, setCurrentView] = useState<"wallet" | "subscription">("wallet")
 
   const creators: Creator[] = [
     {
@@ -161,6 +163,14 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
 
   const boostProgress = (balance / nextBoostAt) * 100
 
+  const handleSubscriptionClick = () => {
+    setCurrentView("subscription")
+  }
+
+  const handleBackToWallet = () => {
+    setCurrentView("wallet")
+  }
+
   const PaymentMethodsPopup = ({ title, onClose }: { title: string; onClose: () => void }) => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4 overflow-y-auto">
       <div className="w-full max-w-md my-8">
@@ -193,6 +203,16 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
       </div>
     </div>
   )
+
+  if (currentView === "subscription") {
+    return (
+      <TikTokSubscriptionPage 
+        onBack={handleBackToWallet}
+        onNavigateToMain={onBack}
+        onNavigateToWallet={handleBackToWallet}
+      />
+    )
+  }
 
   const CreatorSearchInterface = () => (
     <div className="fixed inset-0 bg-background z-50">
@@ -454,7 +474,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                       <span>Exclusive stickers & effects</span>
                     </div>
                   </div>
-                  <Button className="w-full">Manage Subscription</Button>
+                  <Button className="w-full" onClick={handleSubscriptionClick}>Manage Subscription</Button>
                 </div>
               </CardContent>
             </Card>
