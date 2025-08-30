@@ -218,50 +218,50 @@ export function TikTokSubscriptionPage({
           </div>
 
                      <nav className="space-y-2">
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
-               <Home className="w-6 h-6" />
-               For You
-             </Button>
-             <Button 
-               variant="ghost" 
-               className="w-full justify-start gap-3 text-left text-purple-500"
-               onClick={onNavigateToMain}
-             >
-               <Compass className="w-6 h-6" />
-               Explore
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
-               <Users className="w-6 h-6" />
-               Following
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
-               <Plus className="w-6 h-6" />
-               Upload
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
-               <Radio className="w-6 h-6" />
-               LIVE
-             </Button>
-             <Button 
-               variant="ghost" 
-               className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
-               onClick={onNavigateToWallet}
-             >
-               <Wallet className="w-6 h-6" />
-               Wallet
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-purple-50 text-purple-500">
-               <CreditCard className="w-6 h-6" />
-               Subscription
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
-               <User className="w-6 h-6" />
-               Profile
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600">
-               <MoreHorizontal className="w-6 h-6" />
-               More
-             </Button>
+                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
+                <Home className="w-6 h-6" />
+                For You
+              </Button>
+                           <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-3 text-left text-red-500"
+                onClick={onNavigateToMain}
+              >
+                <Compass className="w-6 h-6" />
+                Explore
+              </Button>
+                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
+                <Users className="w-6 h-6" />
+                Following
+              </Button>
+                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
+                <Plus className="w-6 h-6" />
+                Upload
+              </Button>
+                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
+                <Radio className="w-6 h-6" />
+                LIVE
+              </Button>
+                           <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
+                onClick={onNavigateToWallet}
+              >
+                <Wallet className="w-6 h-6" />
+                Wallet
+              </Button>
+                           <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-red-50 text-red-500">
+                <CreditCard className="w-6 h-6" />
+                Subscription
+              </Button>
+                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
+                <User className="w-6 h-6" />
+                Profile
+              </Button>
+                           <Button variant="ghost" className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600">
+                <MoreHorizontal className="w-6 h-6" />
+                More
+              </Button>
            </nav>
 
                      <div className="mt-8">
@@ -286,23 +286,23 @@ export function TikTokSubscriptionPage({
         <main className="flex-1 p-4 md:p-6 space-y-6 lg:space-y-8 xl:pr-80">
           {/* Mobile Benefits Toggle */}
           <div className="xl:hidden">
-                         <Button
-               variant="outline"
-               className="w-full justify-between border-purple-200 hover:border-purple-300 hover:bg-purple-50"
-               onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
-             >
-               <span className="flex items-center gap-2">
-                 <Sparkles className="w-4 h-4 text-purple-500" />
-                 Subscription Benefits
-               </span>
-               <span>{isBenefitsOpen ? "Hide" : "Show"}</span>
-             </Button>
+                                                   <Button
+                variant="outline"
+                className="w-full justify-between border-red-200 hover:border-red-300 hover:bg-red-50"
+                onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
+              >
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-red-500" />
+                  Subscription Benefits
+                </span>
+                <span>{isBenefitsOpen ? "Hide" : "Show"}</span>
+              </Button>
             
                          {isBenefitsOpen && (
                <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 space-y-4 shadow-md">
                  {benefits.map((benefit, index) => (
                    <div key={index} className="flex items-center gap-3">
-                     <benefit.icon className="w-5 h-5 text-purple-500" />
+                     <benefit.icon className="w-5 h-5 text-red-500" />
                      <span className="text-sm text-gray-800">{benefit.text}</span>
                    </div>
                  ))}
@@ -311,7 +311,7 @@ export function TikTokSubscriptionPage({
           </div>
 
                      {/* Wallet Balance Card */}
-           <div className="bg-gradient-to-br from-purple-400 to-purple-600 text-white border-0 rounded-lg p-6 shadow-lg">
+           <div className="bg-gradient-to-br from-red-400 to-red-600 text-white border-0 rounded-lg p-6 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-white/80 text-sm">Available Balance</p>
@@ -337,7 +337,7 @@ export function TikTokSubscriptionPage({
               </div>
 
               <div className="flex space-x-3">
-                                 <Button className="flex-1 bg-white text-purple-600 hover:bg-white/90">
+                                 <Button className="flex-1 bg-white text-red-600 hover:bg-white/90">
                    <Plus className="w-4 h-4 mr-2" />
                    Add Funds
                  </Button>
@@ -357,8 +357,8 @@ export function TikTokSubscriptionPage({
                onClick={() => setActiveTab("overview")}
                                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                    activeTab === "overview"
-                     ? "bg-white text-purple-900 shadow-sm border border-purple-200"
-                     : "text-gray-600 hover:text-purple-700 hover:bg-purple-50"
+                     ? "bg-white text-red-900 shadow-sm border border-red-200"
+                     : "text-gray-600 hover:text-red-700 hover:bg-red-50"
                  }`}
              >
                Overview
@@ -367,8 +367,8 @@ export function TikTokSubscriptionPage({
                onClick={() => setActiveTab("history")}
                                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                    activeTab === "history"
-                     ? "bg-white text-purple-900 shadow-sm border border-purple-200"
-                     : "text-gray-600 hover:text-purple-700 hover:bg-purple-50"
+                     ? "bg-white text-red-900 shadow-sm border border-red-200"
+                     : "text-gray-600 hover:text-red-700 hover:bg-red-50"
                  }`}
              >
                History
@@ -393,31 +393,31 @@ export function TikTokSubscriptionPage({
                             </Avatar>
                             <div>
                               <h3 className="font-semibold">{creator.name}</h3>
-                                                             <Badge
+                                                                                                                          <Badge
                                  variant={creator.supportLevel === "VIP" ? "default" : "secondary"}
-                                 className={creator.supportLevel === "VIP" ? "bg-purple-500" : ""}
+                                 className={creator.supportLevel === "VIP" ? "bg-red-500" : ""}
                                >
-                                {creator.supportLevel === "VIP" && <Crown className="w-3 h-3 mr-1" />}
-                                {creator.supportLevel}
-                              </Badge>
+                                 {creator.supportLevel === "VIP" && <Crown className="w-3 h-3 mr-1" />}
+                                 {creator.supportLevel}
+                               </Badge>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
-                                                         {creator.hasGifts && (
-                               <Button size="sm" variant="outline" className="gap-2 bg-transparent border-purple-300 hover:bg-purple-50 hover:border-purple-400">
-                                 <Gift className="w-4 h-4 text-purple-500" />
-                                 <span className="hidden sm:inline">Claim Gift</span>
-                               </Button>
-                             )}
-                             <Button size="sm" variant="outline" className="gap-2 relative bg-transparent border-purple-300 hover:bg-purple-50 hover:border-purple-400">
-                               <MessageSquare className="w-4 h-4 text-purple-500" />
-                               <span className="hidden sm:inline">Chat</span>
-                                                               {creator.unreadMessages > 0 && (
-                                   <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 text-xs bg-purple-500">
-                                     {creator.unreadMessages}
-                                   </Badge>
-                                 )}
-                             </Button>
+                                                                                                                   {creator.hasGifts && (
+                                <Button size="sm" variant="outline" className="gap-2 bg-transparent border-red-300 hover:bg-red-50 hover:border-red-400">
+                                  <Gift className="w-4 h-4 text-red-500" />
+                                  <span className="hidden sm:inline">Claim Gift</span>
+                                </Button>
+                              )}
+                              <Button size="sm" variant="outline" className="gap-2 relative bg-transparent border-red-300 hover:bg-red-50 hover:border-red-400">
+                                <MessageSquare className="w-4 h-4 text-red-500" />
+                                <span className="hidden sm:inline">Chat</span>
+                                                                {creator.unreadMessages > 0 && (
+                                    <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 text-xs bg-red-500">
+                                      {creator.unreadMessages}
+                                    </Badge>
+                                  )}
+                              </Button>
                           </div>
                         </div>
                       </CardHeader>
@@ -510,26 +510,26 @@ export function TikTokSubscriptionPage({
         <aside className="fixed right-0 top-0 bottom-0 w-80 bg-white border-l border-gray-200 p-6 hidden xl:block">
                      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
              <div className="flex items-center gap-2 mb-4">
-               <Sparkles className="w-5 h-5 text-purple-500" />
+               <Sparkles className="w-5 h-5 text-red-500" />
                <h3 className="text-lg font-semibold text-gray-800">Subscription Benefits</h3>
              </div>
              <div className="space-y-4">
                {benefits.map((benefit, index) => (
                  <div key={index} className="flex items-center gap-3">
-                   <benefit.icon className="w-5 h-5 text-purple-500" />
+                   <benefit.icon className="w-5 h-5 text-red-500" />
                    <span className="text-sm text-gray-800">{benefit.text}</span>
                  </div>
                ))}
              </div>
            </div>
 
-                     <div className="mt-6 bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6 text-center">
-             <Crown className="w-8 h-8 text-purple-500 mx-auto mb-3" />
+                     <div className="mt-6 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-lg p-6 text-center">
+             <Crown className="w-8 h-8 text-red-500 mx-auto mb-3" />
              <h3 className="font-semibold mb-2 text-gray-800">Upgrade to VIP</h3>
              <p className="text-sm text-gray-600 mb-4">
                Get exclusive access to premium content and direct creator interactions
              </p>
-             <Button className="w-full bg-purple-500 hover:bg-purple-600">Upgrade Now</Button>
+             <Button className="w-full bg-red-500 hover:bg-red-600">Upgrade Now</Button>
            </div>
         </aside>
       </div>
