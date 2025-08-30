@@ -71,6 +71,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   const [showCreatorSearch, setShowCreatorSearch] = useState(false)
   const [showWithdrawPopup, setShowWithdrawPopup] = useState(false)
   const [showEditConfirmation, setShowEditConfirmation] = useState(false)
+  const [showAddPaymentMethodPopup, setShowAddPaymentMethodPopup] = useState(false)
   const [editingMethod, setEditingMethod] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [currentView, setCurrentView] = useState<"wallet" | "subscription">("wallet")
@@ -405,7 +406,11 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                     </Button>
                   </div>
                 ))}
-                <Button variant="outline" className="w-full mt-3 bg-white border-gray-200 hover:bg-gray-50">
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-3 bg-white border-gray-200 hover:bg-gray-50"
+                  onClick={() => setShowAddPaymentMethodPopup(true)}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Payment Method
                 </Button>
@@ -591,6 +596,8 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
       {showAddFundsPopup && <PaymentMethodsPopup title="Add Funds" onClose={() => setShowAddFundsPopup(false)} />}
 
       {showWithdrawPopup && <PaymentMethodsPopup title="Withdraw Funds" onClose={() => setShowWithdrawPopup(false)} />}
+
+      {showAddPaymentMethodPopup && <PaymentMethodsPopup title="Add Payment Method" onClose={() => setShowAddPaymentMethodPopup(false)} />}
 
       {showCreatorSearch && <CreatorSearchInterface />}
 
