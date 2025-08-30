@@ -11,7 +11,6 @@ import { TikTokSubscriptionPage } from "@/components/subs"
 import { TikTokCreatorDashboard } from "@/components/creator"
 import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X, CreditCard, LogOut } from "lucide-react"
 import { TikTokSidebar } from "@/components/tiktok-sidebar"
-import { Heart, Menu, Home, Search } from "lucide-react"
 
 const mockVideos = [
   {
