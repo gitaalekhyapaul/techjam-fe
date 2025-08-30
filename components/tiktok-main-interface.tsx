@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { TikTokMoreMenu } from "@/components/tiktok-more-menu"
+
 import { TikTokWalletPage } from "@/components/tiktok-wallet-page"
 import { TikTokVideoPlayer } from "@/components/tiktok-video-player"
 import { TikTokVideoFeed } from "@/components/tiktok-video-feed"
 import { TikTokLoginPage } from "@/components/tiktok-login-page"
 import { TikTokSubscriptionPage } from "@/components/subs"
 import { TikTokSidebar } from "@/components/tiktok-sidebar"
-import { Heart, Menu, MoreHorizontal, Home, Search } from "lucide-react"
+import { Heart, Menu, Home, Search } from "lucide-react"
 
 const mockVideos = [
   {
@@ -211,7 +211,7 @@ const categories = [
 
 export function TikTokMainInterface() {
   const [activeCategory, setActiveCategory] = useState("All")
-  const [currentView, setCurrentView] = useState<"main" | "more" | "wallet" | "login" | "subscription">("main")
+  const [currentView, setCurrentView] = useState<"main" | "wallet" | "login" | "subscription">("main")
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState<(typeof mockVideos)[0] | null>(null)
   const [showVideoFeed, setShowVideoFeed] = useState(false)
@@ -290,13 +290,7 @@ export function TikTokMainInterface() {
     return <TikTokVideoPlayer video={selectedVideo} onBack={handleCloseVideoPlayer} />
   }
 
-  if (currentView === "more") {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <TikTokMoreMenu onClose={handleBackToMain} onLogout={handleLogout} isLoggedIn={isLoggedIn} />
-      </div>
-    )
-  }
+
 
   if (currentView === "wallet") {
     return <TikTokWalletPage onBack={handleBackToMain} />
@@ -338,9 +332,7 @@ export function TikTokMainInterface() {
             <Button variant="ghost" size="icon" className="hidden sm:flex">
               <Search className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <MoreHorizontal className="w-5 h-5" />
-            </Button>
+
             {!isLoggedIn ? (
               <Button
                 className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-6 py-2 rounded text-sm"
@@ -392,8 +384,6 @@ export function TikTokMainInterface() {
               setCurrentView("wallet")
             } else if (view === "subscription") {
               setCurrentView("subscription")
-            } else if (view === "more") {
-              setCurrentView("more")
             } else if (view === "explore") {
               setShowVideoFeed(true)
             }

@@ -11,7 +11,6 @@ import {
   Plus, 
   Radio, 
   User, 
-  MoreHorizontal, 
   Wallet, 
   CreditCard,
   LogOut,
@@ -48,7 +47,7 @@ export function TikTokSidebar({
     { icon: User, label: "Profile", isActive: false, action: "profile" },
     { icon: Wallet, label: "Wallet", isActive: false, action: "wallet" },
     { icon: CreditCard, label: "Subscription", isActive: false, action: "subscription" },
-    { icon: MoreHorizontal, label: "More", isActive: false, action: "more" },
+
   ]
 
   const handleNavItemClick = (action: string) => {
@@ -58,8 +57,6 @@ export function TikTokSidebar({
       onNavigate("wallet")
     } else if (action === "subscription") {
       onNavigate("subscription")
-    } else if (action === "more") {
-      onNavigate("more")
     } else {
       // Handle other navigation items
       console.log(`Navigating to: ${action}`)
