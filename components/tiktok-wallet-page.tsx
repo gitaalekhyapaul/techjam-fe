@@ -41,7 +41,8 @@ import {
   EyeOff,
   Filter,
   SortAsc,
-  Edit
+  Edit,
+  SparkleIcon
 } from "lucide-react"
 import { TikTokSidebar } from "./tiktok-sidebar"
 
@@ -675,14 +676,14 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <Coins className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
+                    <Zap className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
                     <p className="text-lg font-bold">{coinsUsed.toLocaleString()}</p>
-                    <p className="text-xs text-gray-600">Coins Used</p>
+                    <p className="text-xs text-gray-600">Sparks Used</p>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <HandHeart className="w-6 h-6 text-purple-500 mx-auto mb-1" />
                     <p className="text-lg font-bold">{clapsReceived.toLocaleString()}</p>
-                    <p className="text-xs text-gray-600">Claps Supported</p>
+                    <p className="text-xs text-gray-600">Creations Hyped</p>
                   </div>
                 </div>
                 <div className="space-y-2">
