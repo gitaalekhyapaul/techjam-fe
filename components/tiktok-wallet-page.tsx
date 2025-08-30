@@ -165,7 +165,6 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
 
   const boostProgress = (balance / nextBoostAt) * 100
 
-<<<<<<< Updated upstream
   const handleSubscriptionClick = () => {
     setCurrentView("subscription")
   }
