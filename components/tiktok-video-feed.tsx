@@ -2,25 +2,16 @@
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { TikTokSidebar } from "@/components/tiktok-sidebar"
 import { 
-  Search, 
-  Home, 
-  Compass, 
-  Users, 
-  Plus, 
-  Radio, 
-  User, 
-  MoreHorizontal, 
-  Wallet, 
   Heart, 
   MessageCircle, 
   Bookmark, 
   Share, 
   Volume2, 
   VolumeX,
-  CreditCard
+  Plus
 } from "lucide-react"
 
 interface Video {
@@ -382,20 +373,24 @@ interface TikTokVideoFeedProps {
   onNavigateToMain: () => void
   onNavigateToWallet: () => void
   onNavigateToSubscription: () => void
+  isLoggedIn?: boolean
+  username?: string
 }
 
 export function TikTokVideoFeed({ 
   onBack, 
   onNavigateToMain, 
   onNavigateToWallet, 
-  onNavigateToSubscription 
+  onNavigateToSubscription,
+  isLoggedIn = false,
+  username = ""
 }: TikTokVideoFeedProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
   const [isLiked, setIsLiked] = useState<{ [key: number]: boolean }>({})
   const [isBookmarked, setIsBookmarked] = useState<{ [key: number]: boolean }>({})
   const [isMuted, setIsMuted] = useState(false)
   const [showComments, setShowComments] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
+
   const [coinCount, setCoinCount] = useState<{ [key: number]: number }>({})
   const [showCoinAnimation, setShowCoinAnimation] = useState<{ [key: number]: boolean }>({})
   const videoContainerRef = useRef<HTMLDivElement>(null)
@@ -462,96 +457,39 @@ export function TikTokVideoFeed({
   return (
     <div className="min-h-screen bg-black flex">
       {/* Left Sidebar - Navigation */}
-      <aside className="w-64 bg-white border-r border-gray-200 p-4 hidden lg:block">
-        <div className="mb-6">
-          <div className="flex items-center">
-            <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%203-jvuVYl6iGXvwtQ2TgRywoy9xheweks.png"
-              alt="TikTok Logo"
-              className="h-8 w-auto"
-            />
-          </div>
-        </div>
+      <div className="w-64 hidden lg:block">
 
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input 
-              placeholder="tiru suara anwar ibrahim" 
-              className="pl-10 bg-gray-100 border-0 rounded-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
 
-                                                                                                                                               <nav className="space-y-2">
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-red-50 text-red-500">
-               <Home className="w-6 h-6" />
-               For You
-             </Button>
-             <Button 
-               variant="ghost" 
-               className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500"
-               onClick={onNavigateToMain}
-             >
-               <Compass className="w-6 h-6" />
-               Explore
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500">
-               <Users className="w-6 h-6" />
-               Following
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500">
-               <Plus className="w-6 h-6" />
-               Friends
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500">
-               <Plus className="w-6 h-6" />
-               Upload
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500">
-               <Radio className="w-6 h-6" />
-               LIVE
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500">
-               <User className="w-6 h-6" />
-               Profile
-             </Button>
-             <Button 
-               variant="ghost" 
-               className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500"
-               onClick={onNavigateToWallet}
-             >
-               <Wallet className="w-6 h-6" />
-               Wallet
-             </Button>
-             <Button 
-               variant="ghost" 
-               className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500"
-               onClick={onNavigateToSubscription}
-             >
-               <CreditCard className="w-6 h-6" />
-               Subscription
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-left text-gray-600 hover:bg-red-50 hover:text-red-500">
-               <MoreHorizontal className="w-6 h-6" />
-               More
-             </Button>
-           </nav>
 
-        <div className="mt-8">
-          <div className="text-sm text-gray-500 mb-4">Following accounts</div>
-          <div className="text-xs text-gray-400">Accounts you follow will appear here</div>
-        </div>
 
-        <div className="mt-8 space-y-2 text-xs text-gray-500">
-          <div>Company</div>
-          <div>Programme</div>
-          <div>Terms & Policies</div>
-          <div className="mt-4">© 2025 TikTok</div>
-        </div>
-      </aside>
+
+
+        <TikTokSidebar
+          isLoggedIn={isLoggedIn}
+          username={username}
+          onNavigate={(view) => {
+            if (view === "main") {
+              onNavigateToMain()
+            } else if (view === "wallet") {
+              onNavigateToWallet()
+            } else if (view === "subscription") {
+              onNavigateToSubscription()
+            } else if (view === "explore") {
+              // Stay in video feed
+            }
+          }}
+          onLogout={() => {
+            // Handle logout if needed
+            onNavigateToMain()
+          }}
+          onLogin={() => {
+            // Handle login if needed
+            onNavigateToMain()
+          }}
+          isMobileSidebarOpen={false}
+          onToggleMobileSidebar={() => {}}
+        />
+      </div>
 
       {/* Main Video Player Area */}
       <main className="flex-1 relative bg-black" onWheel={handleWheel} ref={videoContainerRef}>
