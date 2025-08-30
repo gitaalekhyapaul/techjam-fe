@@ -207,7 +207,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
       <div className="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Send TikTok to Creator</h2>
+            <h2 className="text-xl font-bold">Support Creators</h2>
             <Button variant="ghost" size="icon" onClick={() => setShowCreatorSearch(false)}>
               <X className="w-5 h-5" />
             </Button>
@@ -281,6 +281,42 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
             <Button className="w-full">
               <Plus className="w-4 h-4 mr-2" />
               Add New Payment Method
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  // Withdraw Funds Popup Component
+  const WithdrawFundsPopup = ({ onClose }: { onClose: () => void }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-md w-full">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Withdraw Funds</h2>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <CreditCard className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">Credit or Debit Card</span>
+            </Button>
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <Building2 className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">PayPal</span>
+            </Button>
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <Smartphone className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">Google Pay</span>
+            </Button>
+            <Button className="w-full justify-start h-14 text-left bg-white border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 text-gray-800 rounded-xl transition-all duration-200 shadow-sm" variant="outline">
+              <Smartphone className="w-6 h-6 mr-4 flex-shrink-0 text-gray-600" />
+              <span className="text-base font-medium">Apple Pay</span>
             </Button>
           </div>
         </div>
@@ -430,7 +466,14 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                 onClick={() => setShowCreatorSearch(true)}
               >
                 <Send className="w-4 h-4 mr-3" />
-                Send
+                Support creators
+              </Button>
+              <Button
+                className="bg-pink-500 hover:bg-pink-600 text-white w-full h-12 rounded-xl shadow-md"
+                onClick={() => setShowWithdrawPopup(true)}
+              >
+                <Download className="w-4 h-4 mr-3" />
+                Withdraw
               </Button>
             </div>
           </CardContent>
@@ -659,7 +702,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
 
       {/* Popups and Modals */}
       {showAddFundsPopup && <PaymentMethodsPopup title="Add Funds" onClose={() => setShowAddFundsPopup(false)} />}
-      {showWithdrawPopup && <PaymentMethodsPopup title="Withdraw Funds" onClose={() => setShowWithdrawPopup(false)} />}
+      {showWithdrawPopup && <WithdrawFundsPopup onClose={() => setShowWithdrawPopup(false)} />}
       {showAddPaymentMethodPopup && <PaymentMethodsPopup title="Add Payment Method" onClose={() => setShowAddPaymentMethodPopup(false)} />}
       {showCreatorSearch && <CreatorSearchInterface />}
       {showEditConfirmation && editingMethod && (
