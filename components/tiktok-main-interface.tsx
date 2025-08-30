@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { TikTokMoreMenu } from "@/components/tiktok-more-menu"
 import { TikTokWalletPage } from "@/components/tiktok-wallet-page"
 import { TikTokVideoPlayer } from "@/components/tiktok-video-player"
 import { TikTokVideoFeed } from "@/components/tiktok-video-feed"
 import { TikTokLoginPage } from "@/components/tiktok-login-page"
 import { TikTokSubscriptionPage } from "@/components/subs"
-import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X, CreditCard, LogOut } from "lucide-react"
+import { TikTokSidebar } from "@/components/tiktok-sidebar"
+import { Heart, Menu, MoreHorizontal, Home, Search } from "lucide-react"
 
 const mockVideos = [
   {
@@ -228,9 +228,7 @@ export function TikTokMainInterface() {
     }
   }, [])
 
-  const handleMoreClick = () => {
-    setCurrentView("more")
-  }
+
 
   const handleBackToMain = () => {
     setCurrentView("main")
@@ -282,6 +280,8 @@ export function TikTokMainInterface() {
         onNavigateToMain={handleBackToMain}
         onNavigateToWallet={handleWalletClick}
         onNavigateToSubscription={handleSubscriptionClick}
+        isLoggedIn={isLoggedIn}
+        username={username}
       />
     )
   }
@@ -382,115 +382,29 @@ export function TikTokMainInterface() {
       </header>
 
       <div className="flex relative">
-        <aside
-          className={`
-          fixed md:static inset-y-0 left-0 z-50 w-64 min-h-screen p-4 bg-white border-r border-gray-200
-          transform transition-transform duration-300 ease-in-out
-          ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
-        >
-          <div className="flex justify-end mb-4 md:hidden">
-            <Button variant="ghost" size="icon" onClick={toggleMobileSidebar}>
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
+        <TikTokSidebar
+          isLoggedIn={isLoggedIn}
+          username={username}
+          onNavigate={(view) => {
+            if (view === "main") {
+              setCurrentView("main")
+            } else if (view === "wallet") {
+              setCurrentView("wallet")
+            } else if (view === "subscription") {
+              setCurrentView("subscription")
+            } else if (view === "more") {
+              setCurrentView("more")
+            } else if (view === "explore") {
+              setShowVideoFeed(true)
+            }
+          }}
+          onLogout={handleLogout}
+          onLogin={handleLoginClick}
+          isMobileSidebarOpen={isMobileSidebarOpen}
+          onToggleMobileSidebar={toggleMobileSidebar}
+        />
 
-          <div className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input placeholder="Search" className="pl-10 bg-gray-100 border-0 rounded-full" />
-            </div>
-          </div>
 
-          <nav className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
-              onClick={() => setShowVideoFeed(true)}
-            >
-              <Home className="w-6 h-6" />
-              For You
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left text-red-500">
-              <Compass className="w-6 h-6" />
-              Explore
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <Users className="w-6 h-6" />
-              Following
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <Plus className="w-6 h-6" />
-              Upload
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <Radio className="w-6 h-6" />
-              LIVE
-            </Button>
-
-            {/* Only show these items when logged in */}
-            {isLoggedIn && (
-              <>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
-                  onClick={handleWalletClick}
-                >
-                  <Wallet className="w-6 h-6" />
-                  Wallet
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
-                  onClick={handleSubscriptionClick}
-                >
-                  <CreditCard className="w-6 h-6" />
-                  Subscription
-                </Button>
-
-                <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-                  <User className="w-6 h-6" />
-                  Profile
-                </Button>
-              </>
-            )}
-
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left" onClick={handleMoreClick}>
-              <MoreHorizontal className="w-6 h-6" />
-              More
-            </Button>
-          </nav>
-
-          <div className="mt-8">
-            {!isLoggedIn ? (
-              <Button className="w-full bg-red-500 hover:bg-red-600 text-white" onClick={handleLoginClick}>
-                Log in
-              </Button>
-            ) : (
-              <Button 
-                variant="outline" 
-                className="w-full text-gray-700 border-gray-300 hover:bg-gray-50" 
-                onClick={handleLogout}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            )}
-          </div>
-
-          <div className="mt-8 space-y-2 text-xs text-gray-500">
-            <div>Company</div>
-            <div>Programme</div>
-            <div>Terms & Policies</div>
-            <div className="mt-4">© 2025 TikTok</div>
-          </div>
-        </aside>
-
-        {isMobileSidebarOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleMobileSidebar} />
-        )}
 
         <main className="flex-1 p-4 md:p-6">
           {/* Watch Videos Section */}
