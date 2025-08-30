@@ -1,0 +1,5 @@
+[33mfeb5f19[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/gitaalekhyapaul/techjam-fe-2
+[33m1a80649[m Add creator login functionality and logout feature
+[33mfb705b7[m feat: implement unified TikTok sidebar component - Create new TikTokSidebar component that consolidates all sidebar functionality - Replace individual sidebar implementations in main interface and video feed - Add proper navigation handling for wallet, subscription, and more views - Implement responsive design with mobile sidebar support - Maintain consistent TikTok design across all components
+[33m38471b6[m Fix navigation menu styling and coin button functionality in video feed
+[33m4036884[m Merge branch 'main' of https://github.com/gitaalekhyapaul/techjam-fe-2
