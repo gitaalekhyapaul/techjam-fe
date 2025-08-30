@@ -9,17 +9,41 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 
 interface TikTokLoginPageProps {
   onBack: () => void
+  onLoginSuccess: (userType?: 'user' | 'creator') => void
 }
 
-export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
+export function TikTokLoginPage({ onBack, onLoginSuccess }: TikTokLoginPageProps) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Valid credentials
+  const validCredentials = {
+    username: "user123",
+    password: "1234"
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log("Login attempted with:", { username, password })
+    setError("")
+    setIsLoading(true)
+
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    if (username === validCredentials.username && password === validCredentials.password) {
+      // Store login state (in a real app, you'd store a JWT token)
+      localStorage.setItem("isLoggedIn", "true")
+      localStorage.setItem("username", username)
+      localStorage.setItem("userType", "user")
+      onLoginSuccess()
+    } else {
+      setError("Invalid username or password. Use user123 / 1234")
+    }
+    
+    setIsLoading(false)
   }
 
   return (
@@ -47,6 +71,22 @@ export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
             <p className="text-gray-600 mt-2">Log in to your TikTok account</p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Demo Credentials Hint */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-blue-700 text-sm">
+              <strong>Demo Credentials:</strong><br />
+              Username: <code className="bg-blue-100 px-1 rounded">user123</code><br />
+              Password: <code className="bg-blue-100 px-1 rounded">1234</code>
+            </p>
+          </div>
+
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -61,6 +101,7 @@ export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
                 placeholder="Enter your username or email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -77,6 +118,7 @@ export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
                   placeholder="Enter your password"
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   required
+                  disabled={isLoading}
                 />
                 <Button
                   type="button"
@@ -84,6 +126,7 @@ export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
                   size="icon"
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
@@ -101,15 +144,16 @@ export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
             <Button
               type="submit"
               className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold"
+              disabled={isLoading}
             >
-              Log in
+              {isLoading ? "Logging in..." : "Log in"}
             </Button>
           </form>
 
           {/* Sign Up Link */}
           <div className="text-center pt-4 border-t border-gray-200">
             <p className="text-gray-600">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Button variant="link" className="text-red-500 hover:text-red-600 p-0 h-auto font-semibold">
                 add one.
               </Button>
@@ -128,7 +172,7 @@ export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="w-full py-3 border-gray-300 bg-transparent">
+              <Button variant="outline" className="w-full py-3 border-gray-300 bg-transparent" disabled={isLoading}>
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -149,7 +193,7 @@ export function TikTokLoginPage({ onBack }: TikTokLoginPageProps) {
                 </svg>
                 Google
               </Button>
-              <Button variant="outline" className="w-full py-3 border-gray-300 bg-transparent">
+              <Button variant="outline" className="w-full py-3 border-gray-300 bg-transparent" disabled={isLoading}>
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>

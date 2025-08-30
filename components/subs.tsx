@@ -2,19 +2,16 @@
 
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
+
 import {
   Home,
   Compass,
   Users,
-  UserPlus,
-  Upload,
-  Bell,
-  MessageCircle,
+
   Radio,
   User,
   MoreHorizontal,
@@ -36,24 +33,10 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Banknote,
-  History,
+
 } from "lucide-react"
 
-// Data from subscription files
-const sidebarItems = [
-  { icon: Home, label: "For You", active: false },
-  { icon: Compass, label: "Explore", active: false },
-  { icon: Users, label: "Following", active: false },
-  { icon: UserPlus, label: "Friends", active: false },
-  { icon: Upload, label: "Upload", active: false },
-  { icon: Bell, label: "Notifications", active: false, hasNotification: true },
-  { icon: MessageCircle, label: "Messages", active: false },
-  { icon: Radio, label: "LIVE", active: false },
-  { icon: User, label: "Profile", active: false },
-  { icon: Wallet, label: "Wallet", active: false },
-  { icon: CreditCard, label: "Subscription", active: true },
-  { icon: MoreHorizontal, label: "More", active: false },
-]
+
 
 const subscribedCreators = [
   {
