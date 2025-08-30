@@ -35,6 +35,7 @@ import {
   Plus,
   ArrowUpRight,
   ArrowDownLeft,
+  ArrowLeft,
   Banknote,
   History,
 } from "lucide-react"
