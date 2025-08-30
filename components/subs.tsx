@@ -183,9 +183,9 @@ export function TikTokSubscriptionPage({
             <Button variant="ghost" size="icon" className="hidden sm:flex text-gray-700">
               <MoreHorizontal className="w-5 h-5" />
             </Button>
-            <Button className="bg-purple-500 hover:bg-purple-600 text-white px-3 md:px-6 py-2 rounded text-sm">
-              Log in
-            </Button>
+                         <Button className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-6 py-2 rounded text-sm">
+               Log in
+             </Button>
           </div>
         </div>
       </header>
@@ -264,11 +264,11 @@ export function TikTokSubscriptionPage({
              </Button>
            </nav>
 
-          <div className="mt-8">
-            <Button className="w-full bg-purple-500 hover:bg-purple-600 text-white">
-              Log in
-            </Button>
-          </div>
+                     <div className="mt-8">
+             <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
+               Log in
+             </Button>
+           </div>
 
           <div className="mt-8 space-y-2 text-xs text-gray-500">
             <div>Company</div>
