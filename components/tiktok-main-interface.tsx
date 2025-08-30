@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { TikTokMoreMenu } from "@/components/tiktok-more-menu"
@@ -8,7 +8,7 @@ import { TikTokWalletPage } from "@/components/tiktok-wallet-page"
 import { TikTokVideoPlayer } from "@/components/tiktok-video-player"
 import { TikTokLoginPage } from "@/components/tiktok-login-page"
 import { TikTokSubscriptionPage } from "@/components/subs"
-import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X, CreditCard } from "lucide-react"
+import { Search, Home, Compass, Users, Plus, Radio, User, MoreHorizontal, Wallet, Heart, Menu, X, CreditCard, LogOut } from "lucide-react"
 
 const mockVideos = [
   {
@@ -209,11 +209,22 @@ const categories = [
 ]
 
 export function TikTokMainInterface() {
-  const [isWalletOpen, setIsWalletOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState("All")
   const [currentView, setCurrentView] = useState<"main" | "more" | "wallet" | "login" | "subscription">("main")
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState<(typeof mockVideos)[0] | null>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [username, setUsername] = useState("")
+
+  // Check login state on component mount
+  useEffect(() => {
+    const loginState = localStorage.getItem("isLoggedIn")
+    const storedUsername = localStorage.getItem("username")
+    if (loginState === "true") {
+      setIsLoggedIn(true)
+      setUsername(storedUsername || "")
+    }
+  }, [])
 
   const handleMoreClick = () => {
     setCurrentView("more")
@@ -247,6 +258,21 @@ export function TikTokMainInterface() {
     setCurrentView("login")
   }
 
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true)
+    setUsername(localStorage.getItem("username") || "")
+    setCurrentView("main")
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("username")
+    localStorage.removeItem("userType")
+    setIsLoggedIn(false)
+    setUsername("")
+    setCurrentView("main")
+  }
+
   if (selectedVideo) {
     return <TikTokVideoPlayer video={selectedVideo} onBack={handleCloseVideoPlayer} />
   }
@@ -254,7 +280,7 @@ export function TikTokMainInterface() {
   if (currentView === "more") {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <TikTokMoreMenu onClose={handleBackToMain} />
+        <TikTokMoreMenu onClose={handleBackToMain} onLogout={handleLogout} isLoggedIn={isLoggedIn} />
       </div>
     )
   }
@@ -264,7 +290,7 @@ export function TikTokMainInterface() {
   }
 
   if (currentView === "login") {
-    return <TikTokLoginPage onBack={handleBackToMain} />
+    return <TikTokLoginPage onBack={handleBackToMain} onLoginSuccess={handleLoginSuccess} />
   }
 
   if (currentView === "subscription") {
@@ -302,12 +328,25 @@ export function TikTokMainInterface() {
             <Button variant="ghost" size="icon" className="hidden sm:flex">
               <MoreHorizontal className="w-5 h-5" />
             </Button>
-            <Button
-              className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-6 py-2 rounded text-sm"
-              onClick={handleLoginClick}
-            >
-              Log in
-            </Button>
+            {!isLoggedIn ? (
+              <Button
+                className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-6 py-2 rounded text-sm"
+                onClick={handleLoginClick}
+              >
+                Log in
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-700 hidden md:block">Welcome, {username}</span>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-gray-900"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -373,28 +412,34 @@ export function TikTokMainInterface() {
               LIVE
             </Button>
 
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
-              onClick={handleWalletClick}
-            >
-              <Wallet className="w-6 h-6" />
-              Wallet
-            </Button>
+            {/* Only show these items when logged in */}
+            {isLoggedIn && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
+                  onClick={handleWalletClick}
+                >
+                  <Wallet className="w-6 h-6" />
+                  Wallet
+                </Button>
 
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
-              onClick={handleSubscriptionClick}
-            >
-              <CreditCard className="w-6 h-6" />
-              Subscription
-            </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-3 text-left hover:bg-red-50 hover:text-red-600"
+                  onClick={handleSubscriptionClick}
+                >
+                  <CreditCard className="w-6 h-6" />
+                  Subscription
+                </Button>
 
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left">
-              <User className="w-6 h-6" />
-              Profile
-            </Button>
+                <Button variant="ghost" className="w-full justify-start gap-3 text-left">
+                  <User className="w-6 h-6" />
+                  Profile
+                </Button>
+              </>
+            )}
+
             <Button variant="ghost" className="w-full justify-start gap-3 text-left" onClick={handleMoreClick}>
               <MoreHorizontal className="w-6 h-6" />
               More
@@ -402,9 +447,20 @@ export function TikTokMainInterface() {
           </nav>
 
           <div className="mt-8">
-            <Button className="w-full bg-red-500 hover:bg-red-600 text-white" onClick={handleLoginClick}>
-              Log in
-            </Button>
+            {!isLoggedIn ? (
+              <Button className="w-full bg-red-500 hover:bg-red-600 text-white" onClick={handleLoginClick}>
+                Log in
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="w-full text-gray-700 border-gray-300 hover:bg-gray-50" 
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            )}
           </div>
 
           <div className="mt-8 space-y-2 text-xs text-gray-500">

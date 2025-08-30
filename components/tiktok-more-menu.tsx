@@ -24,9 +24,11 @@ import { WalletModal } from "@/components/wallet-modal"
 
 interface TikTokMoreMenuProps {
   onClose?: () => void
+  onLogout?: () => void
+  isLoggedIn?: boolean
 }
 
-export function TikTokMoreMenu({ onClose }: TikTokMoreMenuProps) {
+export function TikTokMoreMenu({ onClose, onLogout, isLoggedIn }: TikTokMoreMenuProps) {
   const [isWalletOpen, setIsWalletOpen] = useState(false)
 
   const menuItems = [
@@ -38,7 +40,7 @@ export function TikTokMoreMenu({ onClose }: TikTokMoreMenuProps) {
     { icon: Moon, label: "Dark mode", hasArrow: true },
     { icon: Settings, label: "Settings", hasArrow: false },
     { icon: MessageSquare, label: "Feedback and help", hasArrow: false },
-    { icon: LogOut, label: "Log out", hasArrow: false },
+    ...(isLoggedIn ? [{ icon: LogOut, label: "Log out", hasArrow: false }] : []),
   ]
 
   const sidebarItems = [
@@ -103,6 +105,12 @@ export function TikTokMoreMenu({ onClose }: TikTokMoreMenuProps) {
               <button
                 key={index}
                 className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group"
+                onClick={() => {
+                  if (item.label === "Log out" && onLogout) {
+                    onLogout()
+                    if (onClose) onClose()
+                  }
+                }}
               >
                 <div className="flex items-center space-x-3">
                   <item.icon className="w-5 h-5 text-black" />

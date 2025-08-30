@@ -276,7 +276,7 @@ export function TikTokSubscriptionPage() {
             <Input
               placeholder="Search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
               className="pl-10 bg-muted border-border"
             />
           </div>
@@ -296,7 +296,7 @@ export function TikTokSubscriptionPage() {
               <Input
                 placeholder="Search"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-muted border-border"
               />
             </div>
@@ -342,7 +342,7 @@ export function TikTokSubscriptionPage() {
                   >
                     <item.icon className="w-5 h-5" />
                     <span>{item.label}</span>
-                    {item.hasNotification && <Badge variant="destructive" className="ml-auto w-2 h-2 p-0" />}
+                    {item.hasNotification && <Badge variant="destructive" className="ml-auto w-2 h-2 p-0">•</Badge>}
                   </Button>
                 ))}
               </nav>
@@ -363,7 +363,7 @@ export function TikTokSubscriptionPage() {
               >
                 <item.icon className="w-5 h-5" />
                 <span>{item.label}</span>
-                {item.hasNotification && <Badge variant="destructive" className="ml-auto w-2 h-2 p-0" />}
+                {item.hasNotification && <Badge variant="destructive" className="ml-auto w-2 h-2 p-0">•</Badge>}
               </Button>
             ))}
           </nav>
