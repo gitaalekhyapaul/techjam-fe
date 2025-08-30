@@ -153,16 +153,16 @@ export function TikTokSubscriptionPage({
   const [activeTab, setActiveTab] = useState<"overview" | "history">("overview")
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="border-b border-gray-200">
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between px-4 md:px-6 py-3">
           <div className="flex items-center gap-4 md:gap-8">
             {onBack && (
-              <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
-                <X className="w-5 h-5" />
+              <Button variant="ghost" size="icon" onClick={onBack} className="text-gray-700">
+                <ArrowLeft className="w-5 h-5" />
               </Button>
             )}
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <Button variant="ghost" size="icon" className="md:hidden text-gray-700" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               <Menu className="w-5 h-5" />
             </Button>
 
@@ -176,10 +176,10 @@ export function TikTokSubscriptionPage({
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
+            <Button variant="ghost" size="icon" className="hidden sm:flex text-gray-700">
               <Search className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
+            <Button variant="ghost" size="icon" className="hidden sm:flex text-gray-700">
               <MoreHorizontal className="w-5 h-5" />
             </Button>
             <Button className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-6 py-2 rounded text-sm">
@@ -199,7 +199,7 @@ export function TikTokSubscriptionPage({
         `}
         >
           <div className="flex justify-end mb-4 md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700">
               <X className="w-5 h-5" />
             </Button>
           </div>
@@ -223,7 +223,7 @@ export function TikTokSubscriptionPage({
             </Button>
             <Button 
               variant="ghost" 
-              className="w-full justify-start gap-3 text-left text-red-500"
+              className="w-full justify-start gap-3 text-left text-pink-500"
               onClick={onNavigateToMain}
             >
               <Compass className="w-6 h-6" />
@@ -243,13 +243,13 @@ export function TikTokSubscriptionPage({
             </Button>
             <Button 
               variant="ghost" 
-              className="w-full justify-start gap-3 text-left hover:bg-purple-50 hover:text-purple-600"
+              className="w-full justify-start gap-3 text-left hover:bg-pink-50 hover:text-pink-600"
               onClick={onNavigateToWallet}
             >
               <Wallet className="w-6 h-6" />
               Wallet
             </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-red-50 text-red-500">
+            <Button variant="ghost" className="w-full justify-start gap-3 text-left bg-pink-50 text-pink-500">
               <CreditCard className="w-6 h-6" />
               Subscription
             </Button>
@@ -298,11 +298,11 @@ export function TikTokSubscriptionPage({
             </Button>
             
             {isBenefitsOpen && (
-              <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+              <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 space-y-4 shadow-md">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center gap-3">
-                    <benefit.icon className="w-5 h-5 text-red-500" />
-                    <span className="text-sm">{benefit.text}</span>
+                    <benefit.icon className="w-5 h-5 text-pink-500" />
+                    <span className="text-sm text-gray-800">{benefit.text}</span>
                   </div>
                 ))}
               </div>
@@ -310,7 +310,7 @@ export function TikTokSubscriptionPage({
           </div>
 
           {/* Wallet Balance Card */}
-          <div className="bg-gradient-to-br from-red-500 to-red-600 text-white border-0 rounded-lg p-6">
+          <div className="bg-gradient-to-br from-pink-400 to-pink-600 text-white border-0 rounded-lg p-6 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-white/80 text-sm">Available Balance</p>
@@ -336,7 +336,7 @@ export function TikTokSubscriptionPage({
               </div>
 
               <div className="flex space-x-3">
-                <Button className="flex-1 bg-white text-red-500 hover:bg-white/90">
+                <Button className="flex-1 bg-white text-pink-600 hover:bg-white/90">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Funds
                 </Button>
@@ -379,10 +379,10 @@ export function TikTokSubscriptionPage({
             <>
               {/* Creators Section */}
               <section>
-                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">Creators (subscribed to)</h2>
+                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 text-gray-800">Creators (subscribed to)</h2>
                                  <div className="space-y-4 lg:space-y-6">
                    {subscribedCreators.map((creator) => (
-                     <div key={creator.id} className="bg-white border border-gray-200 rounded-lg shadow-sm">
+                     <div key={creator.id} className="bg-white border border-gray-200 rounded-lg shadow-md">
                       <CardHeader className="pb-4">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                           <div className="flex items-center gap-3">
@@ -394,7 +394,7 @@ export function TikTokSubscriptionPage({
                               <h3 className="font-semibold">{creator.name}</h3>
                               <Badge
                                 variant={creator.supportLevel === "VIP" ? "default" : "secondary"}
-                                className={creator.supportLevel === "VIP" ? "bg-red-500" : ""}
+                                className={creator.supportLevel === "VIP" ? "bg-pink-500" : ""}
                               >
                                 {creator.supportLevel === "VIP" && <Crown className="w-3 h-3 mr-1" />}
                                 {creator.supportLevel}
@@ -446,10 +446,10 @@ export function TikTokSubscriptionPage({
 
               {/* New Section */}
               <section>
-                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">New</h2>
+                <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 text-gray-800">New</h2>
                 <div className="space-y-4">
                                      {newUpdates.map((update) => (
-                     <div key={update.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                     <div key={update.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
                       <div className="flex items-start gap-3">
                         <Avatar className="w-10 h-10">
                           <AvatarImage src={update.avatar} />
@@ -474,9 +474,9 @@ export function TikTokSubscriptionPage({
           ) : (
             /* History Tab */
             <div className="space-y-4">
-              <h2 className="text-xl font-bold">Recent Transactions</h2>
+              <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
                              {recentTransactions.map((transaction) => (
-                 <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                 <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -507,28 +507,28 @@ export function TikTokSubscriptionPage({
 
         {/* Desktop Benefits Panel */}
         <aside className="fixed right-0 top-0 bottom-0 w-80 bg-white border-l border-gray-200 p-6 hidden xl:block">
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-red-500" />
-              <h3 className="text-lg font-semibold">Subscription Benefits</h3>
+              <Sparkles className="w-5 h-5 text-pink-500" />
+              <h3 className="text-lg font-semibold text-gray-800">Subscription Benefits</h3>
             </div>
             <div className="space-y-4">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <benefit.icon className="w-5 h-5 text-red-500" />
-                  <span className="text-sm">{benefit.text}</span>
+                  <benefit.icon className="w-5 h-5 text-pink-500" />
+                  <span className="text-sm text-gray-800">{benefit.text}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-6 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-lg p-6 text-center">
-            <Crown className="w-8 h-8 text-red-500 mx-auto mb-3" />
-            <h3 className="font-semibold mb-2">Upgrade to VIP</h3>
+          <div className="mt-6 bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 rounded-lg p-6 text-center">
+            <Crown className="w-8 h-8 text-pink-500 mx-auto mb-3" />
+            <h3 className="font-semibold mb-2 text-gray-800">Upgrade to VIP</h3>
             <p className="text-sm text-gray-600 mb-4">
               Get exclusive access to premium content and direct creator interactions
             </p>
-            <Button className="w-full bg-red-500 hover:bg-red-600">Upgrade Now</Button>
+            <Button className="w-full bg-pink-500 hover:bg-pink-600">Upgrade Now</Button>
           </div>
         </aside>
       </div>

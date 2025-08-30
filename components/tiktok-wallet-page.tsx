@@ -31,6 +31,7 @@ import {
   Coins,
   HandHeart,
   Check,
+  Menu,
 } from "lucide-react"
 
 interface Transaction {
@@ -75,6 +76,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   const [editingMethod, setEditingMethod] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [currentView, setCurrentView] = useState<"wallet" | "subscription">("wallet")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const creators: Creator[] = [
     {
@@ -310,6 +312,9 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           <Button variant="ghost" size="icon" onClick={onBack} className="text-gray-700">
             <ArrowLeft className="w-5 h-5" />
           </Button>
+          <Button variant="ghost" size="icon" className="md:hidden text-gray-700" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <Menu className="w-5 h-5" />
+          </Button>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
               <Wallet className="w-6 h-6 text-white" />
@@ -321,6 +326,48 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
+      {/* Mobile Menu */}
+      <div className={`
+        fixed md:hidden inset-y-0 left-0 z-50 w-64 min-h-screen p-4 bg-white border-r border-gray-200
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+      `}>
+        <div className="flex justify-end mb-4">
+          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700">
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+        <div className="space-y-4">
+          <div className="p-4 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg text-white">
+            <h3 className="font-semibold text-lg">TikTok Wallet</h3>
+            <p className="text-sm opacity-80">Manage your digital currency</p>
+          </div>
+          <div className="space-y-2">
+            <Button variant="ghost" className="w-full justify-start gap-3 text-left" onClick={() => setShowAddFundsPopup(true)}>
+              <Plus className="w-5 h-5" />
+              Add Funds
+            </Button>
+            <Button variant="ghost" className="w-full justify-start gap-3 text-left" onClick={() => setShowCreatorSearch(true)}>
+              <Send className="w-5 h-5" />
+              Send TikTok
+            </Button>
+            <Button variant="ghost" className="w-full justify-start gap-3 text-left" onClick={() => setShowWithdrawPopup(true)}>
+              <Download className="w-5 h-5" />
+              Withdraw
+            </Button>
+            <Button variant="ghost" className="w-full justify-start gap-3 text-left" onClick={() => setCurrentView("subscription")}>
+              <Crown className="w-5 h-5" />
+              Subscription
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         {/* Balance Section */}
