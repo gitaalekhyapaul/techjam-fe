@@ -45,6 +45,12 @@ import {
   SparkleIcon
 } from "lucide-react"
 import { TikTokSidebar } from "./tiktok-sidebar"
+import { PaymentSelectionModal } from "./payment-selection-modal"
+import { WithdrawalSelectionModal } from "./withdrawal-selection-modal"
+import { WithdrawalSuccessModal } from "./withdrawal-success-modal"
+import { PaymentSuccessModal } from "./payment-success-modal"
+import { mockApi } from "@/lib/constants"
+import { useEffect } from "react"
 
 interface Transaction {
   id: string
@@ -80,13 +86,14 @@ interface PaymentMethod {
 }
 
 export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
-  const [balance] = useState(1247.5)
+  const [balance, setBalance] = useState(1247.5)
   const [subscriptionLevel] = useState("Premium")
-  const [clapsReceived] = useState(15420)
-  const [coinsUsed] = useState(8750)
+  const [hypesReceived] = useState(15420)
+  const [sparksUsed] = useState(8750)
   const [currentBoost] = useState(2.5)
   const [nextBoostAt] = useState(1500)
   const [showBalance, setShowBalance] = useState(true)
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false)
 
   const [showAddFundsPopup, setShowAddFundsPopup] = useState(false)
   const [showCreatorSearch, setShowCreatorSearch] = useState(false)
@@ -97,6 +104,27 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [currentView, setCurrentView] = useState<"wallet" | "subscription">("wallet")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showPaymentSelection, setShowPaymentSelection] = useState(false)
+  const [paymentAmount, setPaymentAmount] = useState(0)
+  const [showWithdrawalSelection, setShowWithdrawalSelection] = useState(false)
+  const [withdrawalAmount, setWithdrawalAmount] = useState(0)
+  const [showWithdrawalSuccess, setShowWithdrawalSuccess] = useState(false)
+  const [withdrawalResult, setWithdrawalResult] = useState<any>(null)
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false)
+  const [paymentResult, setPaymentResult] = useState<any>(null)
+
+  // Load balance on component mount
+  useEffect(() => {
+    const loadBalance = async () => {
+      try {
+        const balanceData = await mockApi.getWalletBalance()
+        setBalance(balanceData.balance)
+      } catch (error) {
+        console.error("Failed to load balance:", error)
+      }
+    }
+    loadBalance()
+  }, [])
 
   const creators: Creator[] = [
     {
@@ -200,6 +228,61 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
 
   const handleSubscriptionClick = () => {
     setCurrentView("subscription")
+  }
+
+  const handleAddFundsClick = () => {
+    setShowPaymentSelection(true)
+  }
+
+  const handlePaymentSuccess = async (result: any) => {
+    console.log("Payment successful:", result)
+    setShowPaymentSelection(false)
+    
+    try {
+      setIsLoadingBalance(true)
+      // Add the payment amount to the wallet balance
+      const updatedBalance = await mockApi.addToWallet(result.amount)
+      setBalance(updatedBalance.balance)
+      setPaymentResult(result)
+      setShowPaymentSuccess(true)
+    } catch (error) {
+      console.error("Failed to update balance:", error)
+      // Still show success modal even if balance update fails
+      setPaymentResult(result)
+      setShowPaymentSuccess(true)
+    } finally {
+      setIsLoadingBalance(false)
+    }
+  }
+
+  const handleWithdrawClick = () => {
+    setShowWithdrawalSelection(true)
+  }
+
+  const handleWithdrawalSuccess = async (result: any) => {
+    console.log("Withdrawal successful:", result)
+    setShowWithdrawalSelection(false)
+    
+    try {
+      setIsLoadingBalance(true)
+      // Deduct the withdrawal amount from the wallet balance
+      const updatedBalance = await mockApi.withdrawFromWallet(result.amount)
+      setBalance(updatedBalance.balance)
+      setWithdrawalResult(result)
+      setShowWithdrawalSuccess(true)
+    } catch (error) {
+      console.error("Failed to update balance:", error)
+      // Show error if insufficient funds
+      if (error.message === "Insufficient funds") {
+        alert("Insufficient funds for withdrawal")
+        return
+      }
+      // Still show success modal for other errors
+      setWithdrawalResult(result)
+      setShowWithdrawalSuccess(true)
+    } finally {
+      setIsLoadingBalance(false)
+    }
   }
 
   // Creator Search Interface Component
@@ -428,7 +511,12 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
               <div>
                 <p className="text-white/80 text-sm font-medium">Available Balance</p>
                 <div className="flex items-center space-x-2">
-                  {showBalance ? (
+                  {isLoadingBalance ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-lg">Loading...</span>
+                    </div>
+                  ) : showBalance ? (
                     <p className="text-2xl font-bold">${balance.toFixed(2)}</p>
                   ) : (
                     <p className="text-2xl font-bold">••••••</p>
@@ -438,6 +526,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                     size="sm"
                     onClick={() => setShowBalance(!showBalance)}
                     className="p-1 text-white hover:bg-white/20"
+                    disabled={isLoadingBalance}
                   >
                     {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
@@ -453,7 +542,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
             <div className="mb-6">
               <Button
                 className="bg-white text-gray-900 hover:bg-white/90 w-full h-14 text-lg font-semibold rounded-xl shadow-md"
-                onClick={() => setShowAddFundsPopup(true)}
+                onClick={handleAddFundsClick}
               >
                 <Plus className="w-5 h-5 mr-3 text-red-500" />
                 Add Funds
@@ -471,7 +560,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
               </Button>
               <Button
                 className="bg-pink-500 hover:bg-pink-600 text-white w-full h-12 rounded-xl shadow-md"
-                onClick={() => setShowWithdrawPopup(true)}
+                onClick={handleWithdrawClick}
               >
                 <Download className="w-4 h-4 mr-3" />
                 Withdraw
@@ -676,14 +765,14 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <Zap className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
-                    <p className="text-lg font-bold">{coinsUsed.toLocaleString()}</p>
+                    <Coins className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
+                    <p className="text-lg font-bold">{sparksUsed.toLocaleString()}</p>
                     <p className="text-xs text-gray-600">Sparks Used</p>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <HandHeart className="w-6 h-6 text-purple-500 mx-auto mb-1" />
-                    <p className="text-lg font-bold">{clapsReceived.toLocaleString()}</p>
-                    <p className="text-xs text-gray-600">Creations Hyped</p>
+                    <p className="text-lg font-bold">{hypesReceived.toLocaleString()}</p>
+                    <p className="text-xs text-gray-600">Hypes Supported</p>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -718,6 +807,33 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
             setShowEditConfirmation(false)
             setEditingMethod(null)
           }}
+        />
+      )}
+      {showPaymentSelection && (
+        <PaymentSelectionModal
+          onClose={() => setShowPaymentSelection(false)}
+          onSuccess={handlePaymentSuccess}
+          initialAmount={100}
+        />
+      )}
+      {showWithdrawalSelection && (
+        <WithdrawalSelectionModal
+          onClose={() => setShowWithdrawalSelection(false)}
+          onSuccess={handleWithdrawalSuccess}
+          initialAmount={50}
+          currentBalance={balance}
+        />
+      )}
+      {showWithdrawalSuccess && withdrawalResult && (
+        <WithdrawalSuccessModal
+          onClose={() => setShowWithdrawalSuccess(false)}
+          result={withdrawalResult}
+        />
+      )}
+      {showPaymentSuccess && paymentResult && (
+        <PaymentSuccessModal
+          onClose={() => setShowPaymentSuccess(false)}
+          result={paymentResult}
         />
       )}
     </div>

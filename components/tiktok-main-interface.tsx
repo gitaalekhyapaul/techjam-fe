@@ -315,6 +315,7 @@ export function TikTokMainInterface() {
         onBack={handleBackToMain}
         onNavigateToMain={handleBackToMain}
         onNavigateToWallet={handleWalletClick}
+        onLogout={handleLogout}
       />
     )
   }

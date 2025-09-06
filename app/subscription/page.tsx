@@ -4,14 +4,24 @@ import { useRouter } from "next/navigation"
 
 export default function SubscriptionPage() {
   const router = useRouter()
-  return <TikTokSubscriptionPage  onNavigateToMain={ () => {
+  
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("username")
+    localStorage.removeItem("userType")
     router.push("/")
-  } }
-  onNavigateToWallet={ () => {
-    router.push("/")
-  } }
-  onBack={ () => {  
-    router.push("/")  
-  } }
+  }
+  
+  return <TikTokSubscriptionPage  
+    onNavigateToMain={() => {
+      router.push("/")
+    }}
+    onNavigateToWallet={() => {
+      router.push("/")
+    }}
+    onBack={() => {  
+      router.push("/")  
+    }}
+    onLogout={handleLogout}
   />
 }

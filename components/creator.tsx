@@ -50,11 +50,11 @@ const creatorStats = {
   earnings: {
     monthly: {
       dollars: 3247.80,
-      claps: 15420
+      hypes: 15420
     },
     total: {
       dollars: 28450.75,
-      claps: 125800
+      hypes: 125800
     }
   },
   subscribers: {

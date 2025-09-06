@@ -1,0 +1,71 @@
+# Cursor Rules for TikTok TechJam Frontend
+
+## Ground Rules for Code Generation and Documentation
+
+### 1. API Mocking
+- **Always mock APIs in Next.js** - Never make real API calls during development
+- Use mock data and simulated responses for all backend interactions
+- Implement proper loading states and error handling for mocked APIs
+
+### 2. Data Management
+- **Use constants.ts for any shared data** - Centralize all static data, configuration, and constants
+- Keep mock data, API endpoints, and configuration values in dedicated constant files
+- Maintain type safety for all shared data structures
+
+### 3. Component Development
+- **Focus on making components more readable and reusable**
+- Write clean, well-documented component interfaces
+- Use TypeScript for all component props and state
+- Implement proper error boundaries and loading states
+- Follow React best practices for component composition
+
+### 4. Progress Tracking
+- **Keep a progress log in a doc called Agents.md**
+- Document all major changes, decisions, and implementations
+- Track feature completion status and blockers
+- Maintain a clear development timeline
+
+### 5. Task Planning
+- **Always plan a task before executing it**
+- Break down complex features into smaller, manageable tasks
+- Identify dependencies and potential issues upfront
+- Create clear acceptance criteria for each task
+
+### 6. Communication
+- **Ask for clarifications before coding**
+- Discuss requirements and edge cases before implementation
+- Confirm understanding of user stories and acceptance criteria
+- Validate approach before proceeding with development
+
+### 7. Feature Development Process
+- **Discuss the feature spec with me first before planning the implementation**
+- Review requirements and gather all necessary information
+- Create detailed implementation plans with clear milestones
+- Get approval before starting any major feature development
+
+## Additional Guidelines
+
+### Code Quality
+- Use TypeScript strictly - no `any` types unless absolutely necessary
+- Follow Next.js 15 and React 19 best practices
+- Implement proper error handling and user feedback
+- Write self-documenting code with clear variable and function names
+
+### Testing
+- Mock all external dependencies
+- Test component behavior with various data states
+- Ensure responsive design works across all device sizes
+
+### Documentation
+- Keep README.md updated with current features
+- Document all major architectural decisions
+- Maintain clear component documentation
+- Update Agents.md with progress and learnings
+
+### Git Workflow
+- Commit frequently with clear, descriptive messages
+- Use feature branches for major changes
+- Keep commits focused and atomic
+- Review changes before merging
+
+Remember: These rules are designed to ensure high-quality, maintainable code and smooth collaboration. Always prioritize clarity, reusability, and user experience.

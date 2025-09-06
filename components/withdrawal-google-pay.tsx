@@ -1,0 +1,202 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { X, CreditCard, Check, ArrowDownLeft } from "lucide-react"
+import { GooglePayData, mockApi } from "@/lib/constants"
+
+interface GooglePayWithdrawalProps {
+  onClose: () => void
+  onSuccess: (result: any) => void
+  amount: number
+}
+
+const mockGooglePayCards = [
+  {
+    id: "1",
+    lastFour: "4242",
+    brand: "Visa",
+    expiry: "12/25",
+    isDefault: true
+  },
+  {
+    id: "2", 
+    lastFour: "5555",
+    brand: "Mastercard",
+    expiry: "08/26",
+    isDefault: false
+  },
+  {
+    id: "3",
+    lastFour: "1234",
+    brand: "American Express",
+    expiry: "03/27",
+    isDefault: false
+  }
+]
+
+export function GooglePayWithdrawal({ onClose, onSuccess, amount }: GooglePayWithdrawalProps) {
+  const [selectedCard, setSelectedCard] = useState(mockGooglePayCards[0].id)
+  const [isLoading, setIsLoading] = useState(false)
+  const [step, setStep] = useState<"select" | "confirm">("select")
+
+  const handleWithdraw = async () => {
+    setIsLoading(true)
+    
+    try {
+      const result = await mockApi.processGooglePayWithdrawal({
+        selectedCard,
+        amount
+      })
+      onSuccess(result)
+    } catch (error) {
+      console.error("Google Pay withdrawal failed:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const selectedCardData = mockGooglePayCards.find(card => card.id === selectedCard)
+
+  if (step === "confirm") {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                <ArrowDownLeft className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Confirm Withdrawal</CardTitle>
+                <p className="text-sm text-gray-500">Google Pay</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="w-5 h-5" />
+            </Button>
+          </CardHeader>
+          
+          <CardContent className="space-y-4">
+            <div className="bg-orange-50 p-3 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-orange-800">
+                <ArrowDownLeft className="w-4 h-4" />
+                <span>Withdrawal will be processed in 1-2 business days</span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Amount</span>
+                <span className="text-lg font-bold">${amount.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>Withdrawal Method</span>
+                <span>{selectedCardData?.brand} •••• {selectedCardData?.lastFour}</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setStep("select")}
+                className="flex-1"
+                disabled={isLoading}
+              >
+                Back
+              </Button>
+              <Button
+                onClick={handleWithdraw}
+                className="flex-1 bg-orange-600 hover:bg-orange-700"
+                disabled={isLoading}
+              >
+                {isLoading ? "Processing..." : "Withdraw"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+              <ArrowDownLeft className="w-5 h-5 text-orange-600" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Withdraw via Google Pay</CardTitle>
+              <p className="text-sm text-gray-500">Amount: ${amount.toFixed(2)}</p>
+            </div>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="w-5 h-5" />
+          </Button>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-gray-700">Select Withdrawal Method</h3>
+            {mockGooglePayCards.map((card) => (
+              <div
+                key={card.id}
+                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                  selectedCard === card.id
+                    ? "border-orange-500 bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+                onClick={() => setSelectedCard(card.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="w-5 h-5 text-gray-600" />
+                    <div>
+                      <div className="font-medium text-sm">
+                        {card.brand} •••• {card.lastFour}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Expires {card.expiry}
+                      </div>
+                    </div>
+                  </div>
+                  {selectedCard === card.id && (
+                    <Check className="w-5 h-5 text-orange-600" />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-orange-50 p-3 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-orange-800">
+              <div className="w-4 h-4 bg-orange-600 rounded-full flex items-center justify-center">
+                <Check className="w-3 h-3 text-white" />
+              </div>
+              <span>Google Pay withdrawals are secure and encrypted</span>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => setStep("confirm")}
+              className="flex-1 bg-orange-600 hover:bg-orange-700"
+            >
+              Continue
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

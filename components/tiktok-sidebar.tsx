@@ -154,21 +154,21 @@ export function TikTokSidebar({
 
         {/* Search Bar */}
         {showSearch && (
-          <div className="px-4 mb-6">
+          <div className="px-3 mb-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
               <Input 
                 placeholder={searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-gray-100 border-0 rounded-full text-sm text-gray-500" 
+                className="pl-8 h-9 bg-gray-100 border-0 rounded-full text-xs text-gray-500" 
               />
             </div>
           </div>
         )}
 
         {/* Main Navigation */}
-        <nav className="px-4 space-y-1">
+        <nav className="px-3 space-y-0.5">
           {navItems.map((item, index) => {
             // Only show certain items when logged in
             if (!isLoggedIn && ["Wallet", "Subscription", "Profile"].includes(item.label)) {
@@ -180,7 +180,7 @@ export function TikTokSidebar({
                 key={index}
                 variant="ghost"
                 className={`
-                  w-full justify-start gap-3 text-left h-12 px-3
+                  w-full justify-start gap-3 text-left h-12 px-3 py-2
                   ${item.isActive 
                     ? "bg-red-50 text-red-600 hover:bg-red-100" 
                     : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
@@ -188,10 +188,10 @@ export function TikTokSidebar({
                 `}
                 onClick={() => handleNavItemClick(item.action)}
               >
-                <item.icon className={`w-6 h-6 ${item.isActive ? "text-red-600" : "text-gray-600"}`} />
-                {!isCompact && <span className="font-medium">{item.label}</span>}
+                <item.icon className={`w-5 h-5 flex-shrink-0 ${item.isActive ? "text-red-600" : "text-gray-600"}`} />
+                {!isCompact && <span className="font-medium text-xs whitespace-nowrap">{item.label}</span>}
                 {item.hasNotification === true && !isCompact && (
-                  <div className="ml-auto w-2 h-2 bg-red-500 rounded-full"></div>
+                  <div className="ml-auto w-1.5 h-1.5 bg-red-500 rounded-full flex-shrink-0"></div>
                 )}
               </Button>
             )
@@ -200,18 +200,18 @@ export function TikTokSidebar({
 
         {/* Following Accounts Section */}
         {showFollowingSection && !isCompact && (
-          <div className="px-4 mt-8">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Following accounts</h3>
-            <p className="text-sm text-gray-500">Accounts you follow will appear here.</p>
+          <div className="px-3 mt-6">
+            <h3 className="text-xs font-semibold text-gray-700 mb-2">Following accounts</h3>
+            <p className="text-xs text-gray-500 leading-tight">Accounts you follow will appear here.</p>
           </div>
         )}
 
         {/* Login/Logout Section */}
         {!isCompact && (
-          <div className="px-4 mt-8">
+          <div className="px-3 mt-6">
             {!isLoggedIn ? (
               <Button 
-                className="w-full bg-red-500 hover:bg-red-600 text-white" 
+                className="w-full bg-red-500 hover:bg-red-600 text-white h-10 text-xs font-medium" 
                 onClick={onLogin}
               >
                 Log in
@@ -219,10 +219,10 @@ export function TikTokSidebar({
             ) : (
               <Button 
                 variant="outline" 
-                className="w-full text-gray-700 border-gray-300 hover:bg-gray-50" 
+                className="w-full text-gray-700 border-gray-300 hover:bg-gray-50 h-10 text-xs font-medium" 
                 onClick={onLogout}
               >
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut className="w-3.5 h-3.5 mr-1.5" />
                 Logout
               </Button>
             )}
@@ -231,11 +231,11 @@ export function TikTokSidebar({
 
         {/* Footer Links */}
         {showFooter && !isCompact && (
-          <div className="px-4 mt-8 space-y-2 text-xs text-gray-500">
-            <div>Company</div>
-            <div>Programme</div>
-            <div>Terms & Policies</div>
-            <div className="mt-4">© 2025 TikTok</div>
+          <div className="px-3 mt-6 space-y-1 text-xs text-gray-500">
+            <div className="hover:text-gray-700 cursor-pointer">Company</div>
+            <div className="hover:text-gray-700 cursor-pointer">Programme</div>
+            <div className="hover:text-gray-700 cursor-pointer">Terms & Policies</div>
+            <div className="mt-3 text-xs">© 2025 TikTok</div>
           </div>
         )}
       </aside>

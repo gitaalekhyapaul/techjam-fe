@@ -508,7 +508,7 @@ export function TikTokVideoFeed({
             <Button variant="ghost" className="text-white hover:bg-white/20">
               <div className="flex items-center gap-1">
                 <div className="w-5 h-5 bg-yellow-500 rounded-full"></div>
-                <span className="text-white">Get Coins</span>
+                <span className="text-white">Get Sparks</span>
               </div>
             </Button>
             <Button variant="ghost" className="text-white hover:bg-white/20">
