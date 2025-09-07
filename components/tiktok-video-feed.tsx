@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/shared/ui/button"
 import { Avatar, AvatarFallback } from "@/components/shared/ui/avatar"
 import { TikTokSidebar } from "@/components/tiktok-sidebar"
@@ -27,6 +27,7 @@ interface Video {
   saves: string
   sound: string
   creator: string
+  _id?: string // MongoDB ObjectId
 }
 
 const mockVideos: Video[] = [
@@ -390,12 +391,56 @@ export function TikTokVideoFeed({
   const [isBookmarked, setIsBookmarked] = useState<{ [key: number]: boolean }>({})
   const [isMuted, setIsMuted] = useState(false)
   const [showComments, setShowComments] = useState(false)
+  const [videos, setVideos] = useState<Video[]>(mockVideos)
+  const [loading, setLoading] = useState(true)
 
   const [coinCount, setCoinCount] = useState<{ [key: number]: number }>({})
   const [showCoinAnimation, setShowCoinAnimation] = useState<{ [key: number]: boolean }>({})
   const videoContainerRef = useRef<HTMLDivElement>(null)
 
-  const currentVideo = mockVideos[currentVideoIndex]
+  // Load videos from database on component mount
+  useEffect(() => {
+    const loadVideos = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/videos')
+        const data = await response.json()
+        
+        if (data.success && data.videos.length > 0) {
+          // Convert database videos to the expected format
+          const dbVideos = data.videos.map((video: any) => ({
+            id: video.videoId,
+            thumbnail: video.thumbnail,
+            views: video.views.display,
+            username: video.creatorUsername,
+            verified: video.isVerified,
+            description: video.description,
+            likes: video.likes.display,
+            comments: video.comments.display,
+            shares: video.shares.display,
+            saves: video.saves.display,
+            sound: video.sound.name,
+            creator: video.creatorUsername,
+            _id: video._id
+          }))
+          setVideos(dbVideos)
+        } else {
+          // Fallback to mock videos if no database videos
+          setVideos(mockVideos)
+        }
+      } catch (error) {
+        console.error("Failed to load videos:", error)
+        // Fallback to mock videos on error
+        setVideos(mockVideos)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadVideos()
+  }, [])
+
+  const currentVideo = videos[currentVideoIndex]
 
   const handleLike = (videoId: number) => {
     setIsLiked(prev => ({

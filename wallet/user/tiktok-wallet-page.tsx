@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { TikTokSubscriptionPage } from "@/components/subs"
 import { Button } from "@/components/shared/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/ui/card"
@@ -48,9 +48,9 @@ import { TikTokSidebar } from "@/components/tiktok-sidebar"
 import { PaymentSelectionModal } from "@/components/shared/payment-selection-modal"
 import { WithdrawalSelectionModal } from "@/components/shared/withdrawal-selection-modal"
 import { WithdrawalSuccessModal } from "@/components/shared/withdrawal-success-modal"
+import { WalletApiService } from "@/lib/services/walletApi"
 import { PaymentSuccessModal } from "@/components/shared/payment-success-modal"
 import { mockApi } from "@/constants/constants"
-import { useEffect } from "react"
 
 interface Transaction {
   id: string
@@ -86,7 +86,9 @@ interface PaymentMethod {
 }
 
 export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
-  const [balance, setBalance] = useState<number | null>(1247.5)
+  const [balance, setBalance] = useState<number | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const [subscriptionLevel] = useState("Premium")
   const [hypesReceived] = useState(15420)
   const [sparksUsed] = useState(8750)
@@ -117,16 +119,28 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     const loadBalance = async () => {
       try {
-        const balanceData = await mockApi.getWalletBalance()
-        if (balanceData && typeof balanceData.balance === 'number') {
-          setBalance(balanceData.balance)
+        setLoading(true)
+        
+        // For now, use a hardcoded user ID since we know user123 exists
+        // In a real app, this would come from authentication
+        const userId = "68bdb7bc0866e35fb0369f1f" // This is the user123 ID from our database
+        setUserId(userId)
+
+        // Get wallet balance directly
+        const response = await fetch(`/api/wallet/user/balance?userId=${userId}`)
+        const walletData = await response.json()
+        
+        if (walletData.success && typeof walletData.balance === 'number') {
+          setBalance(walletData.balance)
         } else {
-          console.error("Invalid balance data received:", balanceData)
-          setBalance(0) // Fallback to 0 if data is invalid
+          console.error("Invalid balance data received:", walletData)
+          setBalance(0)
         }
       } catch (error) {
         console.error("Failed to load balance:", error)
-        setBalance(0) // Fallback to 0 on error
+        setBalance(0)
+      } finally {
+        setLoading(false)
       }
     }
     loadBalance()
@@ -246,9 +260,32 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
     
     try {
       setIsLoadingBalance(true)
-      // Add the payment amount to the wallet balance
-      const updatedBalance = await mockApi.addToWallet(result.amount)
-      setBalance(updatedBalance?.balance || 0)
+      
+      if (!userId) {
+        console.error("No user ID available")
+        setPaymentResult(result)
+        setShowPaymentSuccess(true)
+        return
+      }
+
+      // Add the payment amount to the wallet balance using direct API call
+      const response = await fetch('/api/wallet/user/balance', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          amount: result.amount,
+          operation: 'add'
+        })
+      })
+      
+      const updatedBalance = await response.json()
+      if (updatedBalance.success) {
+        setBalance(updatedBalance.balance)
+      }
+      
       setPaymentResult(result)
       setShowPaymentSuccess(true)
     } catch (error) {
@@ -271,18 +308,38 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
     
     try {
       setIsLoadingBalance(true)
-      // Deduct the withdrawal amount from the wallet balance
-      const updatedBalance = await mockApi.withdrawFromWallet(result.amount)
-      setBalance(updatedBalance?.balance || 0)
+      if (!userId) {
+        console.error("No user ID available")
+        setWithdrawalResult(result)
+        setShowWithdrawalSuccess(true)
+        return
+      }
+
+      // Deduct the withdrawal amount from the wallet balance using direct API call
+      const response = await fetch('/api/wallet/user/balance', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          amount: result.amount,
+          operation: 'withdraw'
+        })
+      })
+      
+      const updatedBalance = await response.json()
+      if (updatedBalance.success) {
+        setBalance(updatedBalance.balance)
+      } else if (updatedBalance.error === 'Insufficient funds') {
+        alert("Insufficient funds for withdrawal")
+        return
+      }
+      
       setWithdrawalResult(result)
       setShowWithdrawalSuccess(true)
     } catch (error) {
       console.error("Failed to update balance:", error)
-      // Show error if insufficient funds
-      if (error.message === "Insufficient funds") {
-        alert("Insufficient funds for withdrawal")
-        return
-      }
       // Still show success modal for other errors
       setWithdrawalResult(result)
       setShowWithdrawalSuccess(true)

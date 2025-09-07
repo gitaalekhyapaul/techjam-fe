@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/shared/ui/button"
 import { Heart, MessageCircle, Share, Bookmark, ArrowLeft, MoreHorizontal, Volume2, VolumeX } from "lucide-react"
+import { WalletApiService } from "@/lib/services/walletApi"
 
 interface VideoPlayerProps {
   video: {
@@ -11,6 +12,7 @@ interface VideoPlayerProps {
     views: string
     username: string
     verified: boolean
+    _id?: string // MongoDB ObjectId for database operations
   }
   onBack: () => void
 }
@@ -25,6 +27,7 @@ export function TikTokVideoPlayer({ video, onBack }: VideoPlayerProps) {
   const [shareCount] = useState(Math.floor(Math.random() * 2000))
   const [clapCount, setClapCount] = useState(Math.floor(Math.random() * 10000))
   const [coinCount, setCoinCount] = useState(Math.floor(Math.random() * 500))
+  const [isTransferring, setIsTransferring] = useState(false)
 
   const handleLike = () => {
     setIsLiked(!isLiked)
@@ -35,8 +38,52 @@ export function TikTokVideoPlayer({ video, onBack }: VideoPlayerProps) {
     setClapCount((prev) => prev + 1)
   }
 
-  const handleCoin = () => {
-    setCoinCount((prev) => prev + 1)
+  const handleCoin = async () => {
+    if (isTransferring) return
+    
+    try {
+      setIsTransferring(true)
+      
+      // Get current user from localStorage
+      const username = localStorage.getItem("username")
+      if (!username) {
+        alert("Please log in to send tokens")
+        return
+      }
+
+      // Get user from database
+      const user = await WalletApiService.getUserByUsername(username)
+      if (!user) {
+        alert("User not found")
+        return
+      }
+
+      // Check if video has MongoDB ID
+      if (!video._id) {
+        alert("Video not found in database")
+        return
+      }
+
+      // Transfer token
+      const result = await WalletApiService.transferTokens(user.id, video._id, 1)
+      
+      if (result.success) {
+        setCoinCount((prev) => prev + 1)
+        // Show success message
+        console.log("Token transferred successfully!")
+      } else {
+        alert("Failed to transfer token: " + result.error)
+      }
+    } catch (error) {
+      console.error("Token transfer error:", error)
+      if (error.message === "Insufficient tokens") {
+        alert("You don't have enough tokens!")
+      } else {
+        alert("Failed to transfer token. Please try again.")
+      }
+    } finally {
+      setIsTransferring(false)
+    }
   }
 
   const formatCount = (count: number) => {
@@ -154,13 +201,20 @@ export function TikTokVideoPlayer({ video, onBack }: VideoPlayerProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="w-12 h-12 rounded-full bg-yellow-500/80 text-white hover:bg-yellow-400/80"
+            className={`w-12 h-12 rounded-full text-white hover:bg-yellow-400/80 ${
+              isTransferring ? 'bg-yellow-600/80' : 'bg-yellow-500/80'
+            }`}
             onClick={handleCoin}
+            disabled={isTransferring}
           >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 6v6l4 2" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            {isTransferring ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            )}
           </Button>
           <span className="text-white text-xs mt-1">{formatCount(coinCount)}</span>
         </div>

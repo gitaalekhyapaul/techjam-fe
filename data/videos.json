@@ -1,0 +1,491 @@
+{
+  "videos": [
+    {
+      "id": 1,
+      "thumbnail": "/tiktok-video-thumbnail-1.png",
+      "views": "2.8M",
+      "username": "lexidpratt",
+      "verified": false,
+      "description": "Amazing content! Check this out 🔥 #trending #viral #fyp",
+      "likes": "56.8K",
+      "comments": "4211",
+      "shares": "6451",
+      "saves": "4456",
+      "sound": "Original Sound",
+      "creator": "lexidpratt",
+      "tokens": {
+        "earned": 1250,
+        "spent": 0,
+        "total": 1250,
+        "rate": 0.5
+      }
+    },
+    {
+      "id": 2,
+      "thumbnail": "/tiktok-video-thumbnail-2.png",
+      "views": "3.8M",
+      "username": "mustsharenews",
+      "verified": true,
+      "description": "Breaking news that you need to see! 📰 #news #breaking #viral",
+      "likes": "89.2K",
+      "comments": "5678",
+      "shares": "8234",
+      "saves": "6789",
+      "sound": "Original Sound",
+      "creator": "mustsharenews",
+      "tokens": {
+        "earned": 2100,
+        "spent": 150,
+        "total": 1950,
+        "rate": 0.6
+      }
+    },
+    {
+      "id": 3,
+      "thumbnail": "/tiktok-video-thumbnail-3.png",
+      "views": "630.1K",
+      "username": "kdarshen",
+      "verified": true,
+      "description": "Incredible transformation! You won't believe this 😱 #transformation #amazing #viral",
+      "likes": "23.4K",
+      "comments": "1234",
+      "shares": "2345",
+      "saves": "3456",
+      "sound": "Original Sound",
+      "creator": "kdarshen",
+      "tokens": {
+        "earned": 450,
+        "spent": 0,
+        "total": 450,
+        "rate": 0.7
+      }
+    },
+    {
+      "id": 4,
+      "thumbnail": "/tiktok-video-thumbnail-4.png",
+      "views": "5.2M",
+      "username": "megsdeangells",
+      "verified": true,
+      "description": "This is absolutely mind-blowing! 🤯 #mindblowing #viral #trending",
+      "likes": "156.7K",
+      "comments": "9876",
+      "shares": "12345",
+      "saves": "8765",
+      "sound": "Original Sound",
+      "creator": "megsdeangells",
+      "tokens": {
+        "earned": 3200,
+        "spent": 200,
+        "total": 3000,
+        "rate": 0.6
+      }
+    },
+    {
+      "id": 5,
+      "thumbnail": "/tiktok-video-thumbnail-5.png",
+      "views": "712.7K",
+      "username": "thisntfeb",
+      "verified": false,
+      "description": "You have to see this to believe it! 😍 #amazing #viral #trending",
+      "likes": "34.2K",
+      "comments": "2345",
+      "shares": "3456",
+      "saves": "4567",
+      "sound": "Original Sound",
+      "creator": "thisntfeb",
+      "tokens": {
+        "earned": 600,
+        "spent": 50,
+        "total": 550,
+        "rate": 0.8
+      }
+    },
+    {
+      "id": 6,
+      "thumbnail": "/tiktok-video-thumbnail-6.png",
+      "views": "56.4K",
+      "username": "yungkaiverse",
+      "verified": false,
+      "description": "Check out this amazing content! 🚀 #viral #trending #fyp",
+      "likes": "12.3K",
+      "comments": "890",
+      "shares": "1234",
+      "saves": "567",
+      "sound": "Original Sound",
+      "creator": "yungkaiverse",
+      "tokens": {
+        "earned": 80,
+        "spent": 0,
+        "total": 80,
+        "rate": 1.4
+      }
+    },
+    {
+      "id": 7,
+      "thumbnail": "/cooking-content.png",
+      "views": "1.2M",
+      "username": "chefmaria_",
+      "verified": true,
+      "description": "Delicious recipe you have to try! 👨‍🍳 #cooking #food #recipe",
+      "likes": "45.6K",
+      "comments": "2345",
+      "shares": "3456",
+      "saves": "2345",
+      "sound": "Original Sound",
+      "creator": "chefmaria_",
+      "tokens": {
+        "earned": 900,
+        "spent": 100,
+        "total": 800,
+        "rate": 0.75
+      }
+    },
+    {
+      "id": 8,
+      "thumbnail": "/pet-content.png",
+      "views": "890K",
+      "username": "fluffypaws",
+      "verified": false,
+      "description": "Cutest pet moments! 🐾 #pets #cute #animals",
+      "likes": "34.2K",
+      "comments": "1234",
+      "shares": "2345",
+      "saves": "1234",
+      "sound": "Original Sound",
+      "creator": "fluffypaws",
+      "tokens": {
+        "earned": 650,
+        "spent": 0,
+        "total": 650,
+        "rate": 0.73
+      }
+    },
+    {
+      "id": 9,
+      "thumbnail": "/fashion-content.png",
+      "views": "2.1M",
+      "username": "stylebyava",
+      "verified": true,
+      "description": "Latest fashion trends! 👗 #fashion #style #trending",
+      "likes": "67.8K",
+      "comments": "3456",
+      "shares": "4567",
+      "saves": "3456",
+      "sound": "Original Sound",
+      "creator": "stylebyava",
+      "tokens": {
+        "earned": 1500,
+        "spent": 75,
+        "total": 1425,
+        "rate": 0.71
+      }
+    },
+    {
+      "id": 10,
+      "thumbnail": "/tech-content.png",
+      "views": "445K",
+      "username": "techguru2024",
+      "verified": false,
+      "description": "Amazing tech innovations! 💻 #tech #innovation #future",
+      "likes": "23.4K",
+      "comments": "1234",
+      "shares": "2345",
+      "saves": "1234",
+      "sound": "Original Sound",
+      "creator": "techguru2024",
+      "tokens": {
+        "earned": 350,
+        "spent": 25,
+        "total": 325,
+        "rate": 0.79
+      }
+    },
+    {
+      "id": 11,
+      "thumbnail": "/fitness-content.png",
+      "views": "1.8M",
+      "username": "fitnessjake",
+      "verified": true,
+      "description": "Get fit with these amazing workouts! 💪 #fitness #workout #health",
+      "likes": "56.7K",
+      "comments": "2345",
+      "shares": "3456",
+      "saves": "2345",
+      "sound": "Original Sound",
+      "creator": "fitnessjake",
+      "tokens": {
+        "earned": 1200,
+        "spent": 80,
+        "total": 1120,
+        "rate": 0.67
+      }
+    },
+    {
+      "id": 12,
+      "thumbnail": "/art-content.png",
+      "views": "320K",
+      "username": "artbyluna",
+      "verified": false,
+      "description": "Beautiful artwork that will inspire you! 🎨 #art #creative #inspiration",
+      "likes": "18.9K",
+      "comments": "890",
+      "shares": "1234",
+      "saves": "890",
+      "sound": "Original Sound",
+      "creator": "artbyluna",
+      "tokens": {
+        "earned": 280,
+        "spent": 0,
+        "total": 280,
+        "rate": 0.88
+      }
+    },
+    {
+      "id": 13,
+      "thumbnail": "/travel-content.png",
+      "views": "3.5M",
+      "username": "wanderlust_sam",
+      "verified": true,
+      "description": "Amazing travel destinations! ✈️ #travel #adventure #explore",
+      "likes": "89.1K",
+      "comments": "4567",
+      "shares": "5678",
+      "saves": "4567",
+      "sound": "Original Sound",
+      "creator": "wanderlust_sam",
+      "tokens": {
+        "earned": 2200,
+        "spent": 120,
+        "total": 2080,
+        "rate": 0.63
+      }
+    },
+    {
+      "id": 14,
+      "thumbnail": "/music-content.png",
+      "views": "670K",
+      "username": "beatmaker_pro",
+      "verified": false,
+      "description": "Incredible music production! 🎵 #music #production #beats",
+      "likes": "34.5K",
+      "comments": "1234",
+      "shares": "2345",
+      "saves": "1234",
+      "sound": "Original Sound",
+      "creator": "beatmaker_pro",
+      "tokens": {
+        "earned": 520,
+        "spent": 30,
+        "total": 490,
+        "rate": 0.78
+      }
+    },
+    {
+      "id": 15,
+      "thumbnail": "/comedy-content.png",
+      "views": "4.2M",
+      "username": "funnyguy_mike",
+      "verified": true,
+      "description": "Hilarious comedy that will make you laugh! 😂 #comedy #funny #humor",
+      "likes": "123.4K",
+      "comments": "6789",
+      "shares": "8901",
+      "saves": "6789",
+      "sound": "Original Sound",
+      "creator": "funnyguy_mike",
+      "tokens": {
+        "earned": 2800,
+        "spent": 180,
+        "total": 2620,
+        "rate": 0.67
+      }
+    },
+    {
+      "id": 16,
+      "thumbnail": "/beauty-content.png",
+      "views": "1.5M",
+      "username": "glowup_queen",
+      "verified": true,
+      "description": "Beauty tips and tricks! 💄 #beauty #makeup #tips",
+      "likes": "45.6K",
+      "comments": "2345",
+      "shares": "3456",
+      "saves": "2345",
+      "sound": "Original Sound",
+      "creator": "glowup_queen",
+      "tokens": {
+        "earned": 1000,
+        "spent": 60,
+        "total": 940,
+        "rate": 0.67
+      }
+    },
+    {
+      "id": 17,
+      "thumbnail": "/gaming-content.png",
+      "views": "2.8M",
+      "username": "progamer_alex",
+      "verified": false,
+      "description": "Epic gaming moments! 🎮 #gaming #esports #gamer",
+      "likes": "78.9K",
+      "comments": "3456",
+      "shares": "4567",
+      "saves": "3456",
+      "sound": "Original Sound",
+      "creator": "progamer_alex",
+      "tokens": {
+        "earned": 1800,
+        "spent": 100,
+        "total": 1700,
+        "rate": 0.64
+      }
+    },
+    {
+      "id": 18,
+      "thumbnail": "/dance-content.png",
+      "views": "5.1M",
+      "username": "dancemoves_lily",
+      "verified": true,
+      "description": "Amazing dance moves! 💃 #dance #moves #performance",
+      "likes": "145.6K",
+      "comments": "7890",
+      "shares": "9012",
+      "saves": "7890",
+      "sound": "Original Sound",
+      "creator": "dancemoves_lily",
+      "tokens": {
+        "earned": 3500,
+        "spent": 200,
+        "total": 3300,
+        "rate": 0.69
+      }
+    },
+    {
+      "id": 19,
+      "thumbnail": "/diy-content.png",
+      "views": "780K",
+      "username": "crafty_hands",
+      "verified": false,
+      "description": "Creative DIY projects! 🛠️ #diy #crafts #creative",
+      "likes": "34.2K",
+      "comments": "1234",
+      "shares": "2345",
+      "saves": "1234",
+      "sound": "Original Sound",
+      "creator": "crafty_hands",
+      "tokens": {
+        "earned": 580,
+        "spent": 0,
+        "total": 580,
+        "rate": 0.74
+      }
+    },
+    {
+      "id": 20,
+      "thumbnail": "/nature-content.png",
+      "views": "1.1M",
+      "username": "wildlifephoto",
+      "verified": true,
+      "description": "Stunning nature photography! 🌿 #nature #photography #wildlife",
+      "likes": "45.6K",
+      "comments": "2345",
+      "shares": "3456",
+      "saves": "2345",
+      "sound": "Original Sound",
+      "creator": "wildlifephoto",
+      "tokens": {
+        "earned": 800,
+        "spent": 40,
+        "total": 760,
+        "rate": 0.73
+      }
+    },
+    {
+      "id": 21,
+      "thumbnail": "/sports-content.png",
+      "views": "2.3M",
+      "username": "athlete_zone",
+      "verified": false,
+      "description": "Incredible sports moments! 🏃‍♂️ #sports #athlete #motivation",
+      "likes": "67.8K",
+      "comments": "3456",
+      "shares": "4567",
+      "saves": "3456",
+      "sound": "Original Sound",
+      "creator": "athlete_zone",
+      "tokens": {
+        "earned": 1500,
+        "spent": 90,
+        "total": 1410,
+        "rate": 0.65
+      }
+    },
+    {
+      "id": 22,
+      "thumbnail": "/lifestyle-content.png",
+      "views": "950K",
+      "username": "dailyvibes_",
+      "verified": true,
+      "description": "Daily lifestyle inspiration! ✨ #lifestyle #inspiration #daily",
+      "likes": "34.5K",
+      "comments": "1234",
+      "shares": "2345",
+      "saves": "1234",
+      "sound": "Original Sound",
+      "creator": "dailyvibes_",
+      "tokens": {
+        "earned": 700,
+        "spent": 35,
+        "total": 665,
+        "rate": 0.74
+      }
+    },
+    {
+      "id": 23,
+      "thumbnail": "/education-content.png",
+      "views": "1.7M",
+      "username": "learnwithme",
+      "verified": true,
+      "description": "Learn something new today! 📚 #education #learning #knowledge",
+      "likes": "56.7K",
+      "comments": "2345",
+      "shares": "3456",
+      "saves": "2345",
+      "sound": "Original Sound",
+      "creator": "learnwithme",
+      "tokens": {
+        "earned": 1100,
+        "spent": 70,
+        "total": 1030,
+        "rate": 0.65
+      }
+    },
+    {
+      "id": 24,
+      "thumbnail": "/food-review.png",
+      "views": "3.9M",
+      "username": "foodie_reviews",
+      "verified": true,
+      "description": "Amazing food reviews! 🍕 #food #review #delicious",
+      "likes": "98.7K",
+      "comments": "5678",
+      "shares": "6789",
+      "saves": "5678",
+      "sound": "Original Sound",
+      "creator": "foodie_reviews",
+      "tokens": {
+        "earned": 2500,
+        "spent": 150,
+        "total": 2350,
+        "rate": 0.64
+      }
+    }
+  ],
+  "metadata": {
+    "totalVideos": 24,
+    "lastUpdated": "2025-01-27T00:00:00Z",
+    "version": "1.0.0",
+    "description": "TikTok video data with token economy integration"
+  }
+}
+

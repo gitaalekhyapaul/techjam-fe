@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/shared/ui/button"
 import { Input } from "@/components/shared/ui/input"
-import { Card, CardContent } from "@/components/shared/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/ui/card"
 import { Badge } from "@/components/shared/ui/badge"
 import { Progress } from "@/components/shared/ui/progress"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/shared/ui/avatar"
@@ -35,13 +35,19 @@ import {
   Eye,
   Share2,
   MessageCircle,
-  Bookmark
+  Bookmark,
+  Settings,
+  Play,
+  Gift,
+  Download,
+  Clock
 } from "lucide-react"
 
 import { TikTokSidebar } from "./tiktok-sidebar"
 import { CreatorWithdrawalSelectionModal } from "@/components/shared/creator-withdrawal-selection-modal"
 import { CreatorWithdrawalSuccessModal } from "@/components/shared/creator-withdrawal-success-modal"
 import { CreatorWalletPage } from "@/wallet/creator/creator-wallet-page"
+import { sharingApiService, ShareData, ShareStats } from "@/lib/services/sharingApi"
 import { apiService } from "@/lib/services/api"
 
 // Mock data for creator dashboard
@@ -156,6 +162,10 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
   const [creatorBalance, setCreatorBalance] = useState(creatorStats.accountBalance.current)
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [showWallet, setShowWallet] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [shareStats, setShareStats] = useState<ShareStats | null>(null)
+  const [shareHistory, setShareHistory] = useState<ShareData[]>([])
+  const [isLoadingShares, setIsLoadingShares] = useState(false)
   
   // Real data state
   const [creatorData, setCreatorData] = useState(creatorStats)
@@ -226,6 +236,27 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
     setShowWithdrawalSelection(true)
   }
 
+  const handleShareClick = () => {
+    setShowShareModal(true)
+    loadShareData()
+  }
+
+  const loadShareData = async () => {
+    try {
+      setIsLoadingShares(true)
+      const [stats, history] = await Promise.all([
+        sharingApiService.getShareStats(),
+        sharingApiService.getShareHistory()
+      ])
+      setShareStats(stats)
+      setShareHistory(history)
+    } catch (error) {
+      console.error('Error loading share data:', error)
+    } finally {
+      setIsLoadingShares(false)
+    }
+  }
+
   // Update balance when withdrawal is successful
   const handleWithdrawalSuccess = async (result: any) => {
     console.log("Withdrawal successful:", result)
@@ -282,14 +313,10 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b border-gray-200">
-        <div className="flex items-center justify-between px-3 py-2">
+      {/* Header - iPhone Optimized */}
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+        <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleMobileSidebar}>
-              <Menu className="w-4 h-4" />
-            </Button>
-
             <div className="flex items-center">
               <img
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%203-jvuVYl6iGXvwtQ2TgRywoy9xheweks.png"
@@ -302,7 +329,7 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
-              className="text-gray-700 hover:text-gray-900 text-xs px-2 py-1"
+              className="text-gray-700 hover:text-gray-900 text-xs px-2 py-1 h-8"
               onClick={onLogout}
             >
               <LogOut className="w-3 h-3 mr-1" />
@@ -311,13 +338,13 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
           </div>
         </div>
 
-        <div className="px-3 pb-2">
+        <div className="px-4 pb-2">
           <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => (
               <Button
                 key={tab}
                 variant={activeTab === tab ? "default" : "ghost"}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
+                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 h-8 ${
                   activeTab === tab ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"
                 }`}
                 onClick={() => setActiveTab(tab)}
@@ -329,45 +356,18 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
         </div>
       </header>
 
-      <div className="flex relative">
-        <TikTokSidebar
-          isLoggedIn={true}
-          isMobileSidebarOpen={isMobileSidebarOpen}
-          onToggleMobileSidebar={toggleMobileSidebar}
-          activeView="creator"
-          showMobileOverlay={true}
-          variant="default"
-          showSearch={true}
-          searchPlaceholder="Search"
-          showLogo={true}
-          showFollowingSection={false}
-          showFooter={true}
-          customNavItems={[
-            { icon: Home, label: "For You", action: "foryou", isActive: false },
-            { icon: Compass, label: "Explore", action: "explore", isActive: true },
-            { icon: Users, label: "Following", action: "following", isActive: false },
-            { icon: Plus, label: "Upload", action: "upload", isActive: false },
-            { icon: Radio, label: "LIVE", action: "live", isActive: false },
-            { icon: Wallet, label: "Wallet", action: "wallet", isActive: false, onClick: handleWalletClick },
-            { icon: CreditCard, label: "Subscription", action: "subscription", isActive: false },
-            { icon: User, label: "Profile", action: "profile", isActive: false },
-            { icon: MoreHorizontal, label: "More", action: "more", isActive: false },
-          ]}
-          onLogout={onLogout}
-        />
-
-        {/* Main Content */}
-        <main className="flex-1 lg:ml-64 p-2 space-y-3">
-          {/* Creator Profile Header */}
-          <div className="bg-white rounded-lg shadow-sm p-3">
-            <div className="flex flex-col items-center text-center space-y-3">
+      {/* Main Content - iPhone Optimized */}
+      <main className="max-w-sm mx-auto px-4 py-4 space-y-4">
+          {/* Creator Profile Header - iPhone Size */}
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <div className="flex flex-col items-center text-center space-y-4">
               <div className="relative">
                 <Avatar className="w-16 h-16">
                   <AvatarImage src="/diverse-group-smiling.png" />
                   <AvatarFallback>CD</AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -377,53 +377,60 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <h1 className="text-lg font-bold text-gray-900">Creator Dashboard</h1>
                 <p className="text-gray-600 text-xs">Track your earnings, subscribers, and performance</p>
-                <p className="text-gray-700 text-xs">Professional content creator with focus on lifestyle and entertainment</p>
               </div>
 
-              <div className="flex flex-col gap-1.5 w-full max-w-xs">
-                <Button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 text-xs">
-                  <TrendingUp className="w-3 h-3 mr-1" />
+              <div className="flex flex-col gap-2 w-full">
+                <Button className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 text-sm h-10">
+                  <TrendingUp className="w-4 h-4 mr-2" />
                   Boost Content
                 </Button>
-                <Button variant="outline" className="px-3 py-1.5 text-xs">
-                  <MessageCircle className="w-3 h-3 mr-1" />
+                <Button 
+                  variant="outline" 
+                  className="px-3 py-2 text-sm h-10"
+                  onClick={() => setActiveTab("analytics")}
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
                   Analytics
                 </Button>
-                <Button variant="outline" className="px-3 py-1.5 text-xs">
-                  <Share2 className="w-3 h-3 mr-1" />
+                <Button 
+                  variant="outline" 
+                  className="px-3 py-2 text-sm h-10"
+                  onClick={handleShareClick}
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>
               </div>
 
-              <div className="flex justify-center gap-3 text-xs">
+              <div className="flex justify-center gap-4 text-sm">
                 <div className="text-center">
-                  <div className="font-semibold text-gray-900 text-sm">{formatNumber(creatorStats.subscribers.total)}</div>
+                  <div className="font-semibold text-gray-900 text-base">{formatNumber(creatorStats.subscribers.total)}</div>
                   <div className="text-gray-600 text-xs">subscribers</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-gray-900 text-sm">{formatNumber(creatorStats.analytics.views.total)}</div>
+                  <div className="font-semibold text-gray-900 text-base">{formatNumber(creatorStats.analytics.views.total)}</div>
                   <div className="text-gray-600 text-xs">total views</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-gray-900 text-sm">{formatCurrency(creatorStats.earnings.total.dollars)}</div>
+                  <div className="font-semibold text-gray-900 text-base">{formatCurrency(creatorStats.earnings.total.dollars)}</div>
                   <div className="text-gray-600 text-xs">earned</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Content Tabs */}
-          <div className="bg-white rounded-lg shadow-sm">
+          {/* Content Tabs - iPhone Optimized */}
+          <div className="bg-white rounded-2xl shadow-sm">
             <div className="border-b border-gray-200">
-              <nav className="flex space-x-2 px-3">
+              <nav className="flex space-x-2 px-2">
                 {tabs.map((tab) => (
                   <Button
                     key={tab}
                     variant="ghost"
-                    className={`py-2 px-1 border-b-2 font-medium text-xs ${
+                    className={`py-2 px-3 border-b-2 font-medium text-xs flex-1 ${
                       activeTab === tab
                         ? "border-red-500 text-red-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -436,83 +443,469 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
               </nav>
             </div>
 
-            {/* Tab Content */}
-            <div className="p-3">
+            {/* Tab Content - iPhone Size */}
+            <div className="p-4">
               {activeTab === "overview" && (
-                <div className="space-y-3">
-                  {/* Account Balance Card */}
-                  <div className="bg-gradient-to-br from-blue-300 to-blue-500 text-white border-0 rounded-lg p-3 shadow-lg">
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <p className="text-white/80 text-xs">Current Balance</p>
-                            <div className="flex items-center space-x-2">
-                              {isLoadingBalance ? (
-                                <div className="flex items-center gap-1">
-                                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                  <span className="text-xs">Loading...</span>
-                                </div>
-                              ) : (
-                                <p className="text-lg font-bold">{formatCurrency(creatorBalance)}</p>
-                              )}
+                <div className="space-y-4">
+                  {/* Account Balance Card - iPhone Size */}
+                  <div className="bg-gradient-to-br from-blue-300 to-blue-500 text-white border-0 rounded-2xl p-4 shadow-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-white/80 text-xs font-medium">Current Balance</p>
+                        <div className="flex items-center space-x-2">
+                          {isLoadingBalance ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span className="text-sm">Loading...</span>
                             </div>
-                          </div>
-                      <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-3 h-3" />
+                          ) : (
+                            <p className="text-lg font-bold">{formatCurrency(creatorBalance)}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <DollarSign className="w-4 h-4" />
                       </div>
                     </div>
 
-                    <div className="flex space-x-1.5">
+                    <div className="flex space-x-2">
                       <Button 
-                        className="flex-1 bg-white text-blue-600 hover:bg-white/90 text-xs py-1.5"
+                        className="flex-1 bg-white text-blue-600 hover:bg-white/90 text-sm py-2 h-10"
                         onClick={handleWithdrawClick}
                       >
-                        <ArrowUpRight className="w-3 h-3 mr-1" />
+                        <ArrowUpRight className="w-4 h-4 mr-1" />
                         Withdraw
                       </Button>
                       <Button
                         variant="outline"
-                        className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent text-xs py-1.5"
+                        className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent text-sm py-2 h-10"
+                        onClick={() => setActiveTab("analytics")}
                       >
-                        <BarChart3 className="w-3 h-3 mr-1" />
+                        <BarChart3 className="w-4 h-4 mr-1" />
                         Analytics
                       </Button>
                     </div>
                   </div>
 
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <Card>
-                      <CardContent className="p-2">
+                  {/* Stats Grid - iPhone Size */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <Card className="rounded-2xl">
+                      <CardContent className="p-3">
                         <div className="text-center">
-                          <div className="text-sm font-bold text-blue-600">{formatNumber(creatorStats.subscribers.total)}</div>
+                          <div className="text-lg font-bold text-blue-600">{formatNumber(creatorStats.subscribers.total)}</div>
                           <div className="text-xs text-gray-600">Subscribers</div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card>
-                      <CardContent className="p-2">
+                    <Card className="rounded-2xl">
+                      <CardContent className="p-3">
                         <div className="text-center">
-                          <div className="text-sm font-bold text-green-600">{formatNumber(creatorStats.analytics.views.monthly)}</div>
+                          <div className="text-lg font-bold text-green-600">{formatNumber(creatorStats.analytics.views.monthly)}</div>
                           <div className="text-xs text-gray-600">Monthly Views</div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card>
-                      <CardContent className="p-2">
+                    <Card className="rounded-2xl">
+                      <CardContent className="p-3">
                         <div className="text-center">
-                          <div className="text-sm font-bold text-purple-600">{creatorStats.analytics.engagement.rate}%</div>
+                          <div className="text-lg font-bold text-purple-600">{creatorStats.analytics.engagement.rate}%</div>
                           <div className="text-xs text-gray-600">Engagement</div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card>
-                      <CardContent className="p-2">
+                    <Card className="rounded-2xl">
+                      <CardContent className="p-3">
                         <div className="text-center">
-                          <div className="text-sm font-bold text-orange-600">{formatCurrency(creatorStats.earnings.monthly.dollars)}</div>
+                          <div className="text-lg font-bold text-orange-600">{formatCurrency(creatorStats.earnings.monthly.dollars)}</div>
                           <div className="text-xs text-gray-600">Monthly Earnings</div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Additional Content to Extend Page */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">New subscriber</p>
+                            <p className="text-xs text-gray-500">2 hours ago</p>
+                          </div>
+                          <div className="text-sm font-semibold text-green-600">+1</div>
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Video earned tokens</p>
+                            <p className="text-xs text-gray-500">4 hours ago</p>
+                          </div>
+                          <div className="text-sm font-semibold text-blue-600">+5</div>
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Withdrawal processed</p>
+                            <p className="text-xs text-gray-500">1 day ago</p>
+                          </div>
+                          <div className="text-sm font-semibold text-orange-600">-$50.00</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Performance Overview */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Performance Overview</h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Content Performance</p>
+                            <p className="text-xs text-gray-500">Last 30 days</p>
+                          </div>
+                          <div className="text-2xl font-bold text-purple-600">8.7%</div>
+                        </div>
+                        <div className="mt-2">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-purple-600 h-2 rounded-full" style={{width: '87%'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Growth Rate</p>
+                            <p className="text-xs text-gray-500">This month</p>
+                          </div>
+                          <div className="text-2xl font-bold text-green-600">+12%</div>
+                        </div>
+                        <div className="mt-2">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-green-600 h-2 rounded-full" style={{width: '75%'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
+                        <Plus className="w-5 h-5 mb-1" />
+                        <span className="text-xs">Upload Video</span>
+                      </Button>
+                      <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
+                        <BarChart3 className="w-5 h-5 mb-1" />
+                        <span className="text-xs">View Analytics</span>
+                      </Button>
+                      <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
+                        <Users className="w-5 h-5 mb-1" />
+                        <span className="text-xs">Manage Fans</span>
+                      </Button>
+                      <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
+                        <Settings className="w-5 h-5 mb-1" />
+                        <span className="text-xs">Settings</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Content Calendar */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Content Calendar</h3>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="grid grid-cols-7 gap-2 mb-4">
+                        <div className="text-center text-sm font-medium text-gray-500">Mon</div>
+                        <div className="text-center text-sm font-medium text-gray-500">Tue</div>
+                        <div className="text-center text-sm font-medium text-gray-500">Wed</div>
+                        <div className="text-center text-sm font-medium text-gray-500">Thu</div>
+                        <div className="text-center text-sm font-medium text-gray-500">Fri</div>
+                        <div className="text-center text-sm font-medium text-gray-500">Sat</div>
+                        <div className="text-center text-sm font-medium text-gray-500">Sun</div>
+                      </div>
+                      <div className="grid grid-cols-7 gap-2">
+                        {Array.from({ length: 28 }, (_, i) => (
+                          <div key={i} className={`h-8 rounded flex items-center justify-center text-sm ${
+                            i === 15 ? 'bg-blue-500 text-white' : 
+                            i % 7 === 0 || i % 7 === 6 ? 'bg-gray-200' : 
+                            'bg-white border border-gray-200'
+                          }`}>
+                            {i + 1}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Earnings Breakdown */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Earnings Breakdown</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <DollarSign className="w-4 h-4 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Video Tokens</p>
+                            <p className="text-xs text-gray-500">From user interactions</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-gray-900">$1,250.00</p>
+                          <p className="text-xs text-gray-500">+15% this month</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <Users className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Subscriptions</p>
+                            <p className="text-xs text-gray-500">Monthly recurring</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-gray-900">$450.00</p>
+                          <p className="text-xs text-gray-500">+8% this month</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <Gift className="w-4 h-4 text-purple-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Gifts & Tips</p>
+                            <p className="text-xs text-gray-500">Direct fan support</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-gray-900">$320.00</p>
+                          <p className="text-xs text-gray-500">+22% this month</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top Performing Content */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Top Performing Content</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                          <Play className="w-5 h-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Dance Challenge Tutorial</p>
+                          <p className="text-xs text-gray-500">2.3M views • $125 earned</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-green-600">+45%</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                          <Play className="w-5 h-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Cooking Tips & Tricks</p>
+                          <p className="text-xs text-gray-500">1.8M views • $98 earned</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-green-600">+32%</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                          <Play className="w-5 h-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Lifestyle Vlog</p>
+                          <p className="text-xs text-gray-500">1.2M views • $67 earned</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-green-600">+18%</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer Spacing */}
+                  <div className="h-20"></div>
+                </div>
+              )}
+
+              {activeTab === "videos" && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Your Videos</h3>
+                    <Button className="bg-red-500 hover:bg-red-600 text-white">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Upload Video
+                    </Button>
+                  </div>
+                  
+                  {/* Video Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { id: 1, title: "Dance Challenge Tutorial", views: "2.3M", likes: "145K", tokens: 125, thumbnail: "/tiktok-video-thumbnail-1.png" },
+                      { id: 2, title: "Cooking Tips & Tricks", views: "1.8M", likes: "98K", tokens: 98, thumbnail: "/tiktok-video-thumbnail-2.png" },
+                      { id: 3, title: "Lifestyle Vlog", views: "1.2M", likes: "67K", tokens: 67, thumbnail: "/tiktok-video-thumbnail-3.png" },
+                      { id: 4, title: "Fitness Routine", views: "950K", likes: "54K", tokens: 54, thumbnail: "/tiktok-video-thumbnail-4.png" },
+                      { id: 5, title: "Tech Review", views: "800K", likes: "43K", tokens: 43, thumbnail: "/tiktok-video-thumbnail-5.png" },
+                      { id: 6, title: "Travel Vlog", views: "650K", likes: "38K", tokens: 38, thumbnail: "/tiktok-video-thumbnail-6.png" }
+                    ].map((video) => (
+                      <div key={video.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                        <div className="relative">
+                          <img 
+                            src={video.thumbnail} 
+                            alt={video.title}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                            {video.views}
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <h4 className="font-medium text-gray-900 mb-2 line-clamp-2">{video.title}</h4>
+                          <div className="flex items-center justify-between text-sm text-gray-600">
+                            <div className="flex items-center gap-4">
+                              <span className="flex items-center gap-1">
+                                <Heart className="w-4 h-4" />
+                                {video.likes}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Eye className="w-4 h-4" />
+                                {video.views}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1 text-green-600 font-medium">
+                              <DollarSign className="w-4 h-4" />
+                              ${video.tokens}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "analytics" && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Analytics Dashboard</h3>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">7D</Button>
+                      <Button variant="outline" size="sm">30D</Button>
+                      <Button className="bg-red-500 hover:bg-red-600 text-white" size="sm">90D</Button>
+                    </div>
+                  </div>
+                  
+
+                  {/* Analytics Overview Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-600">Total Views</p>
+                            <p className="text-2xl font-bold text-gray-900">2.8M</p>
+                            <p className="text-xs text-green-600">+12.5% vs last month</p>
+                          </div>
+                          <Eye className="w-8 h-8 text-blue-500" />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-600">Engagement Rate</p>
+                            <p className="text-2xl font-bold text-gray-900">8.7%</p>
+                            <p className="text-xs text-green-600">+2.1% vs last month</p>
+                          </div>
+                          <Heart className="w-8 h-8 text-red-500" />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-600">New Followers</p>
+                            <p className="text-2xl font-bold text-gray-900">1,240</p>
+                            <p className="text-xs text-green-600">+8.3% vs last month</p>
+                          </div>
+                          <Users className="w-8 h-8 text-green-500" />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-600">Revenue</p>
+                            <p className="text-2xl font-bold text-gray-900">$2,450</p>
+                            <p className="text-xs text-green-600">+15.2% vs last month</p>
+                          </div>
+                          <DollarSign className="w-8 h-8 text-yellow-500" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Charts Section */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Views Over Time</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+                          <div className="text-center">
+                            <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-500">Chart visualization would go here</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Top Performing Content</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {[
+                            { title: "Dance Challenge Tutorial", views: "2.3M", engagement: "12.5%" },
+                            { title: "Cooking Tips & Tricks", views: "1.8M", engagement: "9.8%" },
+                            { title: "Lifestyle Vlog", views: "1.2M", engagement: "8.2%" }
+                          ].map((video, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{video.title}</p>
+                                <p className="text-xs text-gray-500">{video.views} views</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-bold text-gray-900">{video.engagement}</p>
+                                <p className="text-xs text-gray-500">engagement</p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </CardContent>
                     </Card>
@@ -520,33 +913,133 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
                 </div>
               )}
 
-              {activeTab === "videos" && (
-                <div className="text-center py-6">
-                  <BarChart3 className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-medium text-gray-900 mb-1">Video Analytics</h3>
-                  <p className="text-gray-500 text-xs">Track your video performance and engagement metrics</p>
-                </div>
-              )}
-
-              {activeTab === "analytics" && (
-                <div className="text-center py-6">
-                  <TrendingUp className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-medium text-gray-900 mb-1">Analytics Dashboard</h3>
-                  <p className="text-gray-500 text-xs">Detailed insights into your content performance</p>
-                </div>
-              )}
-
               {activeTab === "earnings" && (
-                <div className="text-center py-6">
-                  <DollarSign className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-medium text-gray-900 mb-1">Earnings Overview</h3>
-                  <p className="text-gray-500 text-xs">Track your revenue and payment history</p>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Earnings Overview</h3>
+                    <Button variant="outline" size="sm">
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Report
+                    </Button>
+                  </div>
+                  
+
+                  {/* Earnings Summary */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="bg-gradient-to-br from-green-50 to-green-100">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-green-700">This Month</p>
+                            <p className="text-2xl font-bold text-green-900">$2,450.00</p>
+                            <p className="text-xs text-green-600">+15.2% vs last month</p>
+                          </div>
+                          <DollarSign className="w-8 h-8 text-green-600" />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-blue-700">Total Earned</p>
+                            <p className="text-2xl font-bold text-blue-900">$28,450.75</p>
+                            <p className="text-xs text-blue-600">All time</p>
+                          </div>
+                          <TrendingUp className="w-8 h-8 text-blue-600" />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-purple-700">Pending</p>
+                            <p className="text-2xl font-bold text-purple-900">$450.00</p>
+                            <p className="text-xs text-purple-600">Processing</p>
+                          </div>
+                          <Clock className="w-8 h-8 text-purple-600" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Earnings Breakdown */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Earnings Breakdown</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {[
+                          { source: "Video Tokens", amount: 1250.00, percentage: 51, color: "bg-green-500" },
+                          { source: "Subscriptions", amount: 450.00, percentage: 18, color: "bg-blue-500" },
+                          { source: "Gifts & Tips", amount: 320.00, percentage: 13, color: "bg-purple-500" },
+                          { source: "Brand Partnerships", amount: 430.00, percentage: 18, color: "bg-orange-500" }
+                        ].map((item, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-900">{item.source}</span>
+                              <span className="text-sm font-bold text-gray-900">${item.amount.toFixed(2)}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className={`h-2 rounded-full ${item.color}`}
+                                style={{ width: `${item.percentage}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Recent Transactions */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Recent Transactions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {[
+                          { description: "Video token earnings", amount: 125.00, date: "2 hours ago", type: "credit" },
+                          { description: "Subscription payment", amount: 45.00, date: "1 day ago", type: "credit" },
+                          { description: "Gift from fan", amount: 25.00, date: "2 days ago", type: "credit" },
+                          { description: "Withdrawal to bank", amount: -500.00, date: "3 days ago", type: "debit" }
+                        ].map((transaction, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                transaction.type === 'credit' ? 'bg-green-100' : 'bg-red-100'
+                              }`}>
+                                {transaction.type === 'credit' ? (
+                                  <ArrowDownRight className="w-4 h-4 text-green-600" />
+                                ) : (
+                                  <ArrowUpRight className="w-4 h-4 text-red-600" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
+                                <p className="text-xs text-gray-500">{transaction.date}</p>
+                              </div>
+                            </div>
+                            <p className={`text-sm font-bold ${
+                              transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {transaction.type === 'credit' ? '+' : ''}${transaction.amount.toFixed(2)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
             </div>
           </div>
-        </main>
-      </div>
+      </main>
 
       {/* Creator Withdrawal Modals */}
       {showWithdrawalSelection && (
@@ -562,6 +1055,118 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
           onClose={() => setShowWithdrawalSuccess(false)}
           result={withdrawalResult}
         />
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">Share Your Content</h2>
+                <Button variant="ghost" size="icon" onClick={() => setShowShareModal(false)}>
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="p-6 max-h-96 overflow-y-auto">
+              {isLoadingShares ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-2">Loading share data...</span>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Share Stats */}
+                  {shareStats && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-gray-900">{shareStats.totalShares.toLocaleString()}</div>
+                        <div className="text-sm text-gray-600">Total Shares</div>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-gray-900">{shareStats.totalClicks.toLocaleString()}</div>
+                        <div className="text-sm text-gray-600">Total Clicks</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Platform Breakdown */}
+                  {shareStats && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Platform Performance</h3>
+                      <div className="space-y-2">
+                        {shareStats.platformBreakdown.map((platform, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                                <Share2 className="w-4 h-4 text-white" />
+                              </div>
+                              <span className="font-medium text-gray-900">{platform.platform}</span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-bold text-gray-900">{platform.shares} shares</div>
+                              <div className="text-xs text-gray-500">{platform.clicks} clicks</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Share History */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Recent Shares</h3>
+                    <div className="space-y-2">
+                      {shareHistory.slice(0, 5).map((share) => (
+                        <div key={share.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                              <Share2 className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{share.title}</p>
+                              <p className="text-xs text-gray-500">{share.platform} • {new Date(share.timestamp).toLocaleDateString()}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-bold text-gray-900">{share.shares} shares</div>
+                            <div className="text-xs text-gray-500">{share.clicks} clicks</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quick Share Buttons */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Share to Platform</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      {['TikTok', 'Instagram', 'Twitter', 'Facebook', 'YouTube'].map((platform) => (
+                        <Button
+                          key={platform}
+                          variant="outline"
+                          className="h-12 flex items-center justify-center gap-2"
+                          onClick={() => {
+                            sharingApiService.shareContent(platform, {
+                              title: 'My Latest Content',
+                              description: 'Check out this amazing content!'
+                            })
+                            setShowShareModal(false)
+                          }}
+                        >
+                          <Share2 className="w-4 h-4" />
+                          {platform}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
