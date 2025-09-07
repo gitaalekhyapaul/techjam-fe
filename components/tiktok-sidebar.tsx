@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/shared/ui/button"
+import { Input } from "@/components/shared/ui/input"
 import { 
   Search, 
   Home, 
@@ -170,8 +170,8 @@ export function TikTokSidebar({
         {/* Main Navigation */}
         <nav className="px-3 space-y-0.5">
           {navItems.map((item, index) => {
-            // Only show certain items when logged in
-            if (!isLoggedIn && ["Wallet", "Subscription", "Profile"].includes(item.label)) {
+            // Only show certain items when logged in (except Wallet for testing)
+            if (!isLoggedIn && ["Subscription", "Profile"].includes(item.label)) {
               return null
             }
 

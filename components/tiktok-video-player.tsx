@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/shared/ui/button"
 import { Heart, MessageCircle, Share, Bookmark, ArrowLeft, MoreHorizontal, Volume2, VolumeX } from "lucide-react"
 
 interface VideoPlayerProps {

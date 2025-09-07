@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useState, useEffect } from "react"
+import { Button } from "@/components/shared/ui/button"
+import { Input } from "@/components/shared/ui/input"
+import { Card, CardContent } from "@/components/shared/ui/card"
+import { Badge } from "@/components/shared/ui/badge"
+import { Progress } from "@/components/shared/ui/progress"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/shared/ui/avatar"
 import { 
   Search, 
   Home, 
@@ -39,6 +39,10 @@ import {
 } from "lucide-react"
 
 import { TikTokSidebar } from "./tiktok-sidebar"
+import { CreatorWithdrawalSelectionModal } from "@/components/shared/creator-withdrawal-selection-modal"
+import { CreatorWithdrawalSuccessModal } from "@/components/shared/creator-withdrawal-success-modal"
+import { CreatorWalletPage } from "@/wallet/creator/creator-wallet-page"
+import { apiService } from "@/lib/services/api"
 
 // Mock data for creator dashboard
 const creatorStats = {
@@ -146,9 +150,111 @@ interface TikTokCreatorDashboardProps {
 export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
+  const [showWithdrawalSelection, setShowWithdrawalSelection] = useState(false)
+  const [showWithdrawalSuccess, setShowWithdrawalSuccess] = useState(false)
+  const [withdrawalResult, setWithdrawalResult] = useState<any>(null)
+  const [creatorBalance, setCreatorBalance] = useState(creatorStats.accountBalance.current)
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false)
+  const [showWallet, setShowWallet] = useState(false)
+  
+  // Real data state
+  const [creatorData, setCreatorData] = useState(creatorStats)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch creator data from API
+  const fetchCreatorData = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      // Fetch creator wallet balance
+      const walletResponse = await apiService.getCreatorWalletBalance()
+      if (walletResponse.success) {
+        setCreatorBalance(walletResponse.balance)
+        setCreatorData(prev => ({
+          ...prev,
+          accountBalance: {
+            current: walletResponse.balance,
+            withdrawn: walletResponse.totalEarnings - walletResponse.balance,
+            unpaid: walletResponse.pendingWithdrawals
+          },
+          earnings: {
+            monthly: {
+              dollars: walletResponse.monthlyEarnings,
+              hypes: Math.round(walletResponse.monthlyEarnings * 100) // Convert to hypes
+            },
+            total: {
+              dollars: walletResponse.totalEarnings,
+              hypes: Math.round(walletResponse.totalEarnings * 100)
+            }
+          }
+        }))
+      }
+      
+      // Fetch creator earnings
+      const earningsResponse = await apiService.getCreatorEarnings(1, 10)
+      if (earningsResponse.success) {
+        setCreatorData(prev => ({
+          ...prev,
+          recentEarnings: earningsResponse.earnings.map(earning => ({
+            source: earning.source,
+            amount: earning.amount,
+            date: new Date(earning.createdAt).toISOString().split('T')[0]
+          }))
+        }))
+      }
+      
+    } catch (err) {
+      console.error('Error fetching creator data:', err)
+      setError('Failed to load creator data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Load data on component mount
+  useEffect(() => {
+    fetchCreatorData()
+  }, [])
 
   const toggleMobileSidebar = () => {
     setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const handleWithdrawClick = () => {
+    setShowWithdrawalSelection(true)
+  }
+
+  // Update balance when withdrawal is successful
+  const handleWithdrawalSuccess = async (result: any) => {
+    console.log("Withdrawal successful:", result)
+    setWithdrawalResult(result)
+    setShowWithdrawalSuccess(true)
+    setShowWithdrawalSelection(false)
+    
+    // Update creator balance immediately if newBalance is provided
+    if (result.newBalance !== undefined) {
+      setCreatorBalance(result.newBalance)
+      setCreatorData(prev => ({
+        ...prev,
+        accountBalance: {
+          ...prev.accountBalance,
+          current: result.newBalance
+        }
+      }))
+    } else {
+      // Fallback: refresh data after successful withdrawal
+      await fetchCreatorData()
+    }
+  }
+
+  const handleWalletClick = () => {
+    setShowWallet(true)
+  }
+
+  const handleBackFromWallet = () => {
+    setShowWallet(false)
   }
 
   const formatCurrency = (amount: number) => {
@@ -169,53 +275,49 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
 
   const tabs = ["overview", "videos", "analytics", "earnings"]
 
+  // Show wallet if wallet is selected
+  if (showWallet) {
+    return <CreatorWalletPage onBack={handleBackFromWallet} />
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-200">
-        <div className="flex items-center justify-between px-4 md:px-6 py-3">
-          <div className="flex items-center gap-4 md:gap-8">
+        <div className="flex items-center justify-between px-3 py-2">
+          <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleMobileSidebar}>
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4 h-4" />
             </Button>
 
             <div className="flex items-center">
               <img
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%203-jvuVYl6iGXvwtQ2TgRywoy9xheweks.png"
                 alt="TikTok Logo"
-                className="h-10 md:h-14 w-auto"
+                className="h-8 w-auto"
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-4">
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <Search className="w-5 h-5" />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="text-gray-700 hover:text-gray-900 text-xs px-2 py-1"
+              onClick={onLogout}
+            >
+              <LogOut className="w-3 h-3 mr-1" />
+              Logout
             </Button>
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <MoreHorizontal className="w-5 h-5" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700 hidden md:block">Creator Dashboard</span>
-              <Button
-                variant="ghost"
-                className="text-gray-700 hover:text-gray-900"
-                onClick={onLogout}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </div>
           </div>
         </div>
 
-        <div className="px-4 md:px-6 pb-3">
+        <div className="px-3 pb-2">
           <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => (
               <Button
                 key={tab}
                 variant={activeTab === tab ? "default" : "ghost"}
-                className={`px-3 md:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
                   activeTab === tab ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"
                 }`}
                 onClick={() => setActiveTab(tab)}
@@ -246,7 +348,7 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
             { icon: Users, label: "Following", action: "following", isActive: false },
             { icon: Plus, label: "Upload", action: "upload", isActive: false },
             { icon: Radio, label: "LIVE", action: "live", isActive: false },
-            { icon: Wallet, label: "Wallet", action: "wallet", isActive: false },
+            { icon: Wallet, label: "Wallet", action: "wallet", isActive: false, onClick: handleWalletClick },
             { icon: CreditCard, label: "Subscription", action: "subscription", isActive: false },
             { icon: User, label: "Profile", action: "profile", isActive: false },
             { icon: MoreHorizontal, label: "More", action: "more", isActive: false },
@@ -255,17 +357,17 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
         />
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-64 p-4 md:p-6 space-y-6">
+        <main className="flex-1 lg:ml-64 p-2 space-y-3">
           {/* Creator Profile Header */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+          <div className="bg-white rounded-lg shadow-sm p-3">
+            <div className="flex flex-col items-center text-center space-y-3">
               <div className="relative">
-                <Avatar className="w-24 h-24 md:w-32 md:h-32">
+                <Avatar className="w-16 h-16">
                   <AvatarImage src="/diverse-group-smiling.png" />
                   <AvatarFallback>CD</AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -275,43 +377,39 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
                 </div>
               </div>
 
-              <div className="flex-1">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Creator Dashboard</h1>
-                    <p className="text-gray-600 text-lg">Track your earnings, subscribers, and performance</p>
-                    <p className="text-gray-700 mt-2 max-w-2xl">Professional content creator with focus on lifestyle and entertainment</p>
-                  </div>
+              <div className="space-y-1">
+                <h1 className="text-lg font-bold text-gray-900">Creator Dashboard</h1>
+                <p className="text-gray-600 text-xs">Track your earnings, subscribers, and performance</p>
+                <p className="text-gray-700 text-xs">Professional content creator with focus on lifestyle and entertainment</p>
+              </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button className="bg-red-500 hover:bg-red-600 text-white px-6 py-2">
-                      <TrendingUp className="w-4 h-4 mr-2" />
-                      Boost Content
-                    </Button>
-                    <Button variant="outline" className="px-6 py-2">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Analytics
-                    </Button>
-                    <Button variant="outline" className="px-6 py-2">
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Share
-                    </Button>
-                  </div>
+              <div className="flex flex-col gap-1.5 w-full max-w-xs">
+                <Button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 text-xs">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  Boost Content
+                </Button>
+                <Button variant="outline" className="px-3 py-1.5 text-xs">
+                  <MessageCircle className="w-3 h-3 mr-1" />
+                  Analytics
+                </Button>
+                <Button variant="outline" className="px-3 py-1.5 text-xs">
+                  <Share2 className="w-3 h-3 mr-1" />
+                  Share
+                </Button>
+              </div>
+
+              <div className="flex justify-center gap-3 text-xs">
+                <div className="text-center">
+                  <div className="font-semibold text-gray-900 text-sm">{formatNumber(creatorStats.subscribers.total)}</div>
+                  <div className="text-gray-600 text-xs">subscribers</div>
                 </div>
-
-                <div className="flex flex-wrap gap-6 mt-4 text-sm">
-                  <div>
-                    <span className="font-semibold text-gray-900">{formatNumber(creatorStats.subscribers.total)}</span>
-                    <span className="text-gray-600 ml-1">subscribers</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-900">{formatNumber(creatorStats.analytics.views.total)}</span>
-                    <span className="text-gray-600 ml-1">total views</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-900">{formatCurrency(creatorStats.earnings.total.dollars)}</span>
-                    <span className="text-gray-600 ml-1">earned</span>
-                  </div>
+                <div className="text-center">
+                  <div className="font-semibold text-gray-900 text-sm">{formatNumber(creatorStats.analytics.views.total)}</div>
+                  <div className="text-gray-600 text-xs">total views</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-gray-900 text-sm">{formatCurrency(creatorStats.earnings.total.dollars)}</div>
+                  <div className="text-gray-600 text-xs">earned</div>
                 </div>
               </div>
             </div>
@@ -320,12 +418,12 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
           {/* Content Tabs */}
           <div className="bg-white rounded-lg shadow-sm">
             <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 px-6">
+              <nav className="flex space-x-2 px-3">
                 {tabs.map((tab) => (
                   <Button
                     key={tab}
                     variant="ghost"
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-2 px-1 border-b-2 font-medium text-xs ${
                       activeTab === tab
                         ? "border-red-500 text-red-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -339,72 +437,82 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
             </div>
 
             {/* Tab Content */}
-            <div className="p-6">
+            <div className="p-3">
               {activeTab === "overview" && (
-                <div className="space-y-6">
+                <div className="space-y-3">
                   {/* Account Balance Card */}
-                  <div className="bg-gradient-to-br from-blue-300 to-blue-500 text-white border-0 rounded-lg p-6 shadow-lg">
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <p className="text-white/80 text-sm">Current Balance</p>
-                        <div className="flex items-center space-x-2">
-                          <p className="text-2xl font-bold">{formatCurrency(creatorStats.accountBalance.current)}</p>
-                        </div>
-                      </div>
-                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-6 h-6" />
+                  <div className="bg-gradient-to-br from-blue-300 to-blue-500 text-white border-0 rounded-lg p-3 shadow-lg">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="text-white/80 text-xs">Current Balance</p>
+                            <div className="flex items-center space-x-2">
+                              {isLoadingBalance ? (
+                                <div className="flex items-center gap-1">
+                                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                  <span className="text-xs">Loading...</span>
+                                </div>
+                              ) : (
+                                <p className="text-lg font-bold">{formatCurrency(creatorBalance)}</p>
+                              )}
+                            </div>
+                          </div>
+                      <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                        <DollarSign className="w-3 h-3" />
                       </div>
                     </div>
 
-                    <div className="flex space-x-3">
-                      <Button className="flex-1 bg-white text-blue-600 hover:bg-white/90">
-                        <ArrowUpRight className="w-4 h-4 mr-2" />
+                    <div className="flex space-x-1.5">
+                      <Button 
+                        className="flex-1 bg-white text-blue-600 hover:bg-white/90 text-xs py-1.5"
+                        onClick={handleWithdrawClick}
+                      >
+                        <ArrowUpRight className="w-3 h-3 mr-1" />
                         Withdraw
                       </Button>
                       <Button
                         variant="outline"
-                        className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent"
+                        className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent text-xs py-1.5"
                       >
-                        <BarChart3 className="w-4 h-4 mr-2" />
+                        <BarChart3 className="w-3 h-3 mr-1" />
                         Analytics
                       </Button>
                     </div>
                   </div>
 
                   {/* Stats Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 gap-2">
                     <Card>
-                      <CardContent className="p-4">
+                      <CardContent className="p-2">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">{formatNumber(creatorStats.subscribers.total)}</div>
-                          <div className="text-sm text-gray-600">Total Subscribers</div>
+                          <div className="text-sm font-bold text-blue-600">{formatNumber(creatorStats.subscribers.total)}</div>
+                          <div className="text-xs text-gray-600">Subscribers</div>
                         </div>
                       </CardContent>
                     </Card>
 
                     <Card>
-                      <CardContent className="p-4">
+                      <CardContent className="p-2">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">{formatNumber(creatorStats.analytics.views.monthly)}</div>
-                          <div className="text-sm text-gray-600">Monthly Views</div>
+                          <div className="text-sm font-bold text-green-600">{formatNumber(creatorStats.analytics.views.monthly)}</div>
+                          <div className="text-xs text-gray-600">Monthly Views</div>
                         </div>
                       </CardContent>
                     </Card>
 
                     <Card>
-                      <CardContent className="p-4">
+                      <CardContent className="p-2">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-purple-600">{creatorStats.analytics.engagement.rate}%</div>
-                          <div className="text-sm text-gray-600">Engagement Rate</div>
+                          <div className="text-sm font-bold text-purple-600">{creatorStats.analytics.engagement.rate}%</div>
+                          <div className="text-xs text-gray-600">Engagement</div>
                         </div>
                       </CardContent>
                     </Card>
 
                     <Card>
-                      <CardContent className="p-4">
+                      <CardContent className="p-2">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-orange-600">{formatCurrency(creatorStats.earnings.monthly.dollars)}</div>
-                          <div className="text-sm text-gray-600">Monthly Earnings</div>
+                          <div className="text-sm font-bold text-orange-600">{formatCurrency(creatorStats.earnings.monthly.dollars)}</div>
+                          <div className="text-xs text-gray-600">Monthly Earnings</div>
                         </div>
                       </CardContent>
                     </Card>
@@ -413,32 +521,48 @@ export function TikTokCreatorDashboard({ onLogout }: TikTokCreatorDashboardProps
               )}
 
               {activeTab === "videos" && (
-                <div className="text-center py-12">
-                  <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Video Analytics</h3>
-                  <p className="text-gray-500">Track your video performance and engagement metrics</p>
+                <div className="text-center py-6">
+                  <BarChart3 className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-medium text-gray-900 mb-1">Video Analytics</h3>
+                  <p className="text-gray-500 text-xs">Track your video performance and engagement metrics</p>
                 </div>
               )}
 
               {activeTab === "analytics" && (
-                <div className="text-center py-12">
-                  <TrendingUp className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Analytics Dashboard</h3>
-                  <p className="text-gray-500">Detailed insights into your content performance</p>
+                <div className="text-center py-6">
+                  <TrendingUp className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-medium text-gray-900 mb-1">Analytics Dashboard</h3>
+                  <p className="text-gray-500 text-xs">Detailed insights into your content performance</p>
                 </div>
               )}
 
               {activeTab === "earnings" && (
-                <div className="text-center py-12">
-                  <DollarSign className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Earnings Overview</h3>
-                  <p className="text-gray-500">Track your revenue and payment history</p>
+                <div className="text-center py-6">
+                  <DollarSign className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-medium text-gray-900 mb-1">Earnings Overview</h3>
+                  <p className="text-gray-500 text-xs">Track your revenue and payment history</p>
                 </div>
               )}
             </div>
           </div>
         </main>
       </div>
+
+      {/* Creator Withdrawal Modals */}
+      {showWithdrawalSelection && (
+        <CreatorWithdrawalSelectionModal
+          onClose={() => setShowWithdrawalSelection(false)}
+          onSuccess={handleWithdrawalSuccess}
+          initialAmount={50}
+          currentBalance={creatorBalance}
+        />
+      )}
+      {showWithdrawalSuccess && withdrawalResult && (
+        <CreatorWithdrawalSuccessModal
+          onClose={() => setShowWithdrawalSuccess(false)}
+          result={withdrawalResult}
+        />
+      )}
     </div>
   )
 }

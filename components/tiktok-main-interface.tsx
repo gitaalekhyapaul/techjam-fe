@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/shared/ui/button"
 
-import { TikTokWalletPage } from "@/components/tiktok-wallet-page"
+import { TikTokWalletPage } from "@/wallet/user/tiktok-wallet-page"
 import { TikTokVideoPlayer } from "@/components/tiktok-video-player"
 import { TikTokVideoFeed } from "@/components/tiktok-video-feed"
 import { TikTokLoginPage } from "@/components/tiktok-login-page"

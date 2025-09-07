@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/shared/ui/button"
+import { Avatar, AvatarFallback } from "@/components/shared/ui/avatar"
 import { TikTokSidebar } from "@/components/tiktok-sidebar"
 import { 
   Heart, 

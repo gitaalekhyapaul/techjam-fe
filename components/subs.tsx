@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/shared/ui/button"
+import { Input } from "@/components/shared/ui/input"
+import { Badge } from "@/components/shared/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/shared/ui/avatar"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shared/ui/card"
 import { 
   Search, 
   Home, 
