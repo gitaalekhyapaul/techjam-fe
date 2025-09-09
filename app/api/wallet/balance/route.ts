@@ -1,74 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-import { DatabaseService } from '@/lib/services/database'
+import { TokenUtils } from '@/constants/tokens'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key'
-
-function verifyToken(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-  
-  const token = authHeader.substring(7)
-  try {
-    return jwt.verify(token, JWT_SECRET) as { userId: string; username: string; userType: string }
-  } catch {
-    return null
-  }
+// Mock user wallet data (in real app, this would be in database)
+let mockUserWallet = {
+  tk: 1000,
+  tki: 400,
+  total: 1004
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const payload = verifyToken(request)
-    if (!payload) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: { 
-            code: 'AUTH_REQUIRED', 
-            message: 'Authentication required' 
-          } 
-        },
-        { status: 401 }
-      )
-    }
-
-    const wallet = await DatabaseService.getWalletByUserId(payload.userId)
-    
-    if (!wallet) {
-      // Create wallet if it doesn't exist
-      const newWallet = await DatabaseService.createWallet({
-        userId: payload.userId as any,
-        initialBalance: 0
-      })
-      
-      return NextResponse.json({
-        success: true,
-        balance: newWallet.balance / 100, // Convert from cents to dollars
-        currency: newWallet.currency,
-        lastUpdated: newWallet.lastUpdated,
-        pendingTransactions: newWallet.pendingTransactions
-      })
-    }
-
+    // Return current user wallet balance
     return NextResponse.json({
       success: true,
-      balance: wallet.balance / 100, // Convert from cents to dollars
-      currency: wallet.currency,
-      lastUpdated: wallet.lastUpdated,
-      pendingTransactions: wallet.pendingTransactions
+      walletType: 'user',
+      balance: {
+        tk: mockUserWallet.tk,
+        tki: mockUserWallet.tki,
+        total: mockUserWallet.total
+      },
+      lastUpdated: new Date().toISOString()
     })
 
   } catch (error) {
-    console.error('Get wallet balance error:', error)
+    console.error('Get balance error:', error)
     return NextResponse.json(
       { 
-        success: false, 
-        error: { 
-          code: 'INTERNAL_ERROR', 
-          message: 'Internal server error' 
-        } 
+        error: 'Failed to get wallet balance',
+        details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     )

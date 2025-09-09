@@ -51,6 +51,7 @@ import { WithdrawalSuccessModal } from "@/components/shared/withdrawal-success-m
 import { WalletApiService } from "@/lib/services/walletApi"
 import { PaymentSuccessModal } from "@/components/shared/payment-success-modal"
 import { mockApi } from "@/constants/constants"
+import { TokenUtils, WalletBalance, TOKEN_DISPLAY } from "@/constants/tokens"
 
 interface Transaction {
   id: string
@@ -86,7 +87,7 @@ interface PaymentMethod {
 }
 
 export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
-  const [balance, setBalance] = useState<number | null>(null)
+  const [walletBalance, setWalletBalance] = useState<WalletBalance | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [subscriptionLevel] = useState("Premium")
@@ -130,15 +131,15 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
         const response = await fetch(`/api/wallet/user/balance?userId=${userId}`)
         const walletData = await response.json()
         
-        if (walletData.success && typeof walletData.balance === 'number') {
-          setBalance(walletData.balance)
+        if (walletData.balance) {
+          setWalletBalance(walletData.balance)
         } else {
           console.error("Invalid balance data received:", walletData)
-          setBalance(0)
+          setWalletBalance(TokenUtils.createBalance(0, 0))
         }
       } catch (error) {
         console.error("Failed to load balance:", error)
-        setBalance(0)
+        setWalletBalance(TokenUtils.createBalance(0, 0))
       } finally {
         setLoading(false)
       }
@@ -244,7 +245,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
     },
   ]
 
-  const boostProgress = ((balance / nextBoostAt) * 100)
+  const boostProgress = ((walletBalance?.total || 0) / nextBoostAt) * 100
 
   const handleSubscriptionClick = () => {
     setCurrentView("subscription")
@@ -282,8 +283,8 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
       })
       
       const updatedBalance = await response.json()
-      if (updatedBalance.success) {
-        setBalance(updatedBalance.balance)
+      if (updatedBalance.balance) {
+        setWalletBalance(updatedBalance.balance)
       }
       
       setPaymentResult(result)
@@ -300,6 +301,21 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
 
   const handleWithdrawClick = () => {
     setShowWithdrawalSelection(true)
+  }
+
+  const refreshBalance = async () => {
+    try {
+      if (!userId) return
+      
+      const response = await fetch(`/api/wallet/user/balance?userId=${userId}`)
+      const walletData = await response.json()
+      
+      if (walletData.balance) {
+        setWalletBalance(walletData.balance)
+      }
+    } catch (error) {
+      console.error("Failed to refresh balance:", error)
+    }
   }
 
   const handleWithdrawalSuccess = async (result: any) => {
@@ -329,12 +345,16 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
       })
       
       const updatedBalance = await response.json()
-      if (updatedBalance.success) {
-        setBalance(updatedBalance.balance)
-      } else if (updatedBalance.error === 'Insufficient funds') {
-        alert("Insufficient funds for withdrawal")
+      if (updatedBalance.balance) {
+        setWalletBalance(updatedBalance.balance)
+        console.log("Balance updated after withdrawal:", updatedBalance.balance)
+      } else if (updatedBalance.error === 'Insufficient total balance') {
+        alert("Insufficient total balance for withdrawal")
         return
       }
+      
+      // Refresh balance to ensure it's up to date
+      await refreshBalance()
       
       setWithdrawalResult(result)
       setShowWithdrawalSuccess(true)
@@ -571,28 +591,42 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12" />
           <CardContent className="p-6 sm:p-8 relative">
             <div className="flex items-center justify-between mb-8">
-              <div>
-                <p className="text-white/80 text-sm font-medium">Available Balance</p>
-                <div className="flex items-center space-x-2">
+              <div className="flex-1">
+                <p className="text-white/80 text-sm font-medium">Wallet Balance</p>
+                <div className="space-y-2">
                   {isLoadingBalance ? (
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span className="text-lg">Loading...</span>
                     </div>
                   ) : showBalance ? (
-                    <p className="text-2xl font-bold">${balance?.toFixed(2) || '0.00'}</p>
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <p className="text-2xl font-bold">{walletBalance?.total?.toFixed(2) || '0.00'}</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowBalance(!showBalance)}
+                          className="p-1 text-white hover:bg-white/20"
+                          disabled={isLoadingBalance}
+                        >
+                          {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm">
+                        <div className="flex items-center space-x-1">
+                          <div className={`w-2 h-2 rounded-full ${TOKEN_DISPLAY.TK.bgColor.replace('bg-', 'bg-')}`}></div>
+                          <span className="text-white/80">{TOKEN_DISPLAY.TK.symbol}: {walletBalance?.tk?.toFixed(2) || '0.00'}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <div className={`w-2 h-2 rounded-full ${TOKEN_DISPLAY.TKI.bgColor.replace('bg-', 'bg-')}`}></div>
+                          <span className="text-white/80">{TOKEN_DISPLAY.TKI.symbol}: {walletBalance?.tki?.toFixed(2) || '0.00'}</span>
+                        </div>
+                      </div>
+                    </div>
                   ) : (
                     <p className="text-2xl font-bold">••••••</p>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowBalance(!showBalance)}
-                    className="p-1 text-white hover:bg-white/20"
-                    disabled={isLoadingBalance}
-                  >
-                    {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
                 </div>
               </div>
               <div className="flex items-center gap-2 bg-pink-300/30 rounded-full px-3 py-1.5">
@@ -806,13 +840,13 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
                   <div className="flex justify-between text-sm">
                     <span>Progress to next boost</span>
                     <span>
-                      ${balance?.toFixed(0) || '0'} / ${nextBoostAt}
+                      ${walletBalance?.total?.toFixed(0) || '0'} / ${nextBoostAt}
                     </span>
                   </div>
                   <Progress value={boostProgress} className="h-2" />
                 </div>
                 <p className="text-xs text-gray-600 text-center">
-                  Spend ${(nextBoostAt - (balance || 0)).toFixed(0)} more to unlock 3x boost!
+                  Spend ${(nextBoostAt - (walletBalance?.total || 0)).toFixed(0)} more to unlock 3x boost!
                 </p>
               </CardContent>
             </Card>
@@ -884,7 +918,7 @@ export function TikTokWalletPage({ onBack }: { onBack: () => void }) {
           onClose={() => setShowWithdrawalSelection(false)}
           onSuccess={handleWithdrawalSuccess}
           initialAmount={50}
-          currentBalance={balance}
+          currentBalance={walletBalance?.total}
         />
       )}
       {showWithdrawalSuccess && withdrawalResult && (

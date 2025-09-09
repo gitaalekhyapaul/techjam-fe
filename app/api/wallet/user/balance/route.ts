@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { DatabaseService } from '@/lib/services/database'
 import { ObjectId } from 'mongodb'
+import { TokenUtils, WalletResponse, WalletBalance } from '@/constants/tokens'
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,15 +25,18 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      balance: wallet.balance,
-      currency: wallet.currency,
-      lastUpdated: wallet.lastUpdated,
-      totalDeposited: wallet.totalDeposited,
-      totalWithdrawn: wallet.totalWithdrawn,
-      totalSpent: wallet.totalSpent
-    })
+    // Convert legacy balance to token format
+    const tokenBalance: WalletBalance = TokenUtils.createBalance(
+      wallet.balance || 0, // TK balance
+      wallet.tkiBalance || 0 // TKI balance
+    )
+
+    const response: WalletResponse = {
+      walletType: 'user',
+      balance: tokenBalance
+    }
+
+    return NextResponse.json(response)
 
   } catch (error) {
     console.error('Get user wallet balance error:', error)
@@ -67,43 +71,68 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    let newBalance = wallet.balance
+    const currentTkBalance = wallet.balance || 0
+    const currentTkiBalance = wallet.tkiBalance || 0
+    const totalBalance = TokenUtils.calculateTotalBalance(currentTkBalance, currentTkiBalance)
+    
+    let newTkBalance = currentTkBalance
+    let newTkiBalance = currentTkiBalance
     let updateData: any = {}
+
+    // Validate transaction
+    const validation = TokenUtils.validateTransaction(amount, totalBalance)
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: validation.error },
+        { status: 400 }
+      )
+    }
 
     switch (operation) {
       case 'add':
-        newBalance = wallet.balance + amount
+        // Add TK and calculate TKI rebate
+        newTkBalance = currentTkBalance + amount
+        const rebate = TokenUtils.calculateRebate(amount)
+        newTkiBalance = currentTkiBalance + rebate
+        
         updateData = {
-          balance: newBalance,
-          totalDeposited: wallet.totalDeposited + amount,
+          balance: newTkBalance,
+          tkiBalance: newTkiBalance,
+          totalDeposited: (wallet.totalDeposited || 0) + amount,
           lastUpdated: new Date()
         }
         break
       case 'subtract':
-        if (wallet.balance < amount) {
-          return NextResponse.json(
-            { error: 'Insufficient funds' },
-            { status: 400 }
-          )
-        }
-        newBalance = wallet.balance - amount
+        // Only deduct from TK balance
+        newTkBalance = currentTkBalance - amount
         updateData = {
-          balance: newBalance,
-          totalSpent: wallet.totalSpent + amount,
+          balance: newTkBalance,
+          totalSpent: (wallet.totalSpent || 0) + amount,
           lastUpdated: new Date()
         }
         break
       case 'withdraw':
-        if (wallet.balance < amount) {
+        // Withdraw from total balance (TK + TKI)
+        if (amount > totalBalance) {
           return NextResponse.json(
-            { error: 'Insufficient funds' },
+            { error: 'Insufficient total balance' },
             { status: 400 }
           )
         }
-        newBalance = wallet.balance - amount
+        
+        // Withdraw from TK first, then TKI if needed
+        if (amount <= currentTkBalance) {
+          newTkBalance = currentTkBalance - amount
+        } else {
+          const remainingAmount = amount - currentTkBalance
+          newTkBalance = 0
+          newTkiBalance = currentTkiBalance - remainingAmount
+        }
+        
         updateData = {
-          balance: newBalance,
-          totalWithdrawn: wallet.totalWithdrawn + amount,
+          balance: newTkBalance,
+          tkiBalance: newTkiBalance,
+          totalWithdrawn: (wallet.totalWithdrawn || 0) + amount,
           lastUpdated: new Date()
         }
         break
@@ -116,14 +145,18 @@ export async function PUT(request: NextRequest) {
 
     const updatedWallet = await DatabaseService.updateUserWallet(userObjectId, updateData)
 
-    return NextResponse.json({
-      success: true,
-      balance: updatedWallet!.balance,
-      currency: updatedWallet!.currency,
-      lastUpdated: updatedWallet!.lastUpdated,
-      operation,
-      amount
-    })
+    // Return updated balance in token format
+    const updatedTokenBalance: WalletBalance = TokenUtils.createBalance(
+      updatedWallet!.balance || 0,
+      updatedWallet!.tkiBalance || 0
+    )
+
+    const response: WalletResponse = {
+      walletType: 'user',
+      balance: updatedTokenBalance
+    }
+
+    return NextResponse.json(response)
 
   } catch (error) {
     console.error('Update user wallet error:', error)

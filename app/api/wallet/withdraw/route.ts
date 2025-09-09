@@ -22,13 +22,13 @@ export async function POST(request: NextRequest) {
 
     if (!method) {
       return NextResponse.json(
-        { error: 'Payment method is required' },
+        { error: 'Withdrawal method is required' },
         { status: 400 }
       )
     }
 
     // Validate amount
-    const validation = TokenUtils.validateAmount(amount, 'TK', 'deposit')
+    const validation = TokenUtils.validateAmount(amount, 'TK', 'withdraw')
     if (!validation.isValid) {
       return NextResponse.json(
         { error: validation.error },
@@ -36,16 +36,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Calculate new balances
-    const newTkBalance = TokenUtils.roundToTwoDecimals(mockUserWallet.tk + amount)
-    const tkiRebate = TokenUtils.calculateRebate(amount)
-    const newTkiBalance = TokenUtils.roundToTwoDecimals(mockUserWallet.tki + tkiRebate)
-    const newTotalBalance = TokenUtils.calculateTotalBalance(newTkBalance, newTkiBalance)
+    // Check if sufficient TK balance
+    if (mockUserWallet.tk < amount) {
+      return NextResponse.json(
+        { error: 'Insufficient TK (Sparks) balance for withdrawal' },
+        { status: 400 }
+      )
+    }
+
+    // Calculate new balances (only deduct TK, TKI remains unchanged)
+    const newTkBalance = TokenUtils.roundToTwoDecimals(mockUserWallet.tk - amount)
+    const newTotalBalance = TokenUtils.calculateTotalBalance(newTkBalance, mockUserWallet.tki)
 
     // Update mock wallet
     mockUserWallet = {
       tk: newTkBalance,
-      tki: newTkiBalance,
+      tki: mockUserWallet.tki, // TKI balance unchanged
       total: newTotalBalance
     }
 
@@ -59,19 +65,19 @@ export async function POST(request: NextRequest) {
         total: mockUserWallet.total
       },
       lastUpdated: new Date().toISOString(),
-      amountAdded: amount,
-      tkiRebate: tkiRebate,
-      paymentMethod: method
+      amountWithdrawn: amount,
+      withdrawalMethod: method
     })
 
   } catch (error) {
-    console.error('Add funds error:', error)
+    console.error('Withdraw funds error:', error)
     return NextResponse.json(
       { 
-        error: 'Failed to add funds',
+        error: 'Failed to withdraw funds',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     )
   }
 }
+

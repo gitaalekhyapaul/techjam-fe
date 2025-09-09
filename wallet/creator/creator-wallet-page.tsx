@@ -49,15 +49,15 @@ import { PaymentSelectionModal } from "@/components/shared/payment-selection-mod
 import { CreatorWithdrawalSelectionModal } from "@/components/shared/creator-withdrawal-selection-modal"
 import { CreatorWithdrawalSuccessModal } from "@/components/shared/creator-withdrawal-success-modal"
 import { PaymentSuccessModal } from "@/components/shared/payment-success-modal"
-import { WalletApiService } from "@/lib/services/walletApi"
 import { mockApi } from "@/constants/constants"
+import { TokenUtils, WalletBalance, TOKEN_DISPLAY } from "@/constants/tokens"
 
 interface CreatorWalletPageProps {
   onBack: () => void
 }
 
 export function CreatorWalletPage({ onBack }: CreatorWalletPageProps) {
-  const [balance, setBalance] = useState<number | null>(null)
+  const [walletBalance, setWalletBalance] = useState<WalletBalance | null>(null)
   const [creatorId, setCreatorId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
@@ -75,37 +75,24 @@ export function CreatorWalletPage({ onBack }: CreatorWalletPageProps) {
       try {
         setLoading(true)
         
-        // Get current user from localStorage
-        const username = localStorage.getItem("username")
-        if (!username) {
-          console.error("No username found in localStorage")
-          setBalance(0)
-          setLoading(false)
-          return
-        }
-
-        // Get user from database
-        const user = await WalletApiService.getUserByUsername(username)
-        if (!user) {
-          console.error("User not found in database")
-          setBalance(0)
-          setLoading(false)
-          return
-        }
-
-        setCreatorId(user.id)
+        // For demo purposes, use a hardcoded creator ID
+        // In a real app, this would come from authentication
+        const demoCreatorId = "68bdb7bc0866e35fb0369f1f"
+        setCreatorId(demoCreatorId)
 
         // Get creator wallet balance
-        const walletData = await WalletApiService.getCreatorWalletBalance(user.id)
-        if (walletData && typeof walletData.balance === 'number') {
-          setBalance(walletData.balance)
+        const response = await fetch(`/api/wallet/creator/balance?creatorId=${demoCreatorId}`)
+        const walletData = await response.json()
+        
+        if (walletData.balance) {
+          setWalletBalance(walletData.balance)
         } else {
           console.error("Invalid balance data received:", walletData)
-          setBalance(0)
+          setWalletBalance(TokenUtils.createBalance(0, 0))
         }
       } catch (error) {
         console.error("Failed to load creator balance:", error)
-        setBalance(0)
+        setWalletBalance(TokenUtils.createBalance(0, 0))
       } finally {
         setLoading(false)
       }
@@ -127,8 +114,31 @@ export function CreatorWalletPage({ onBack }: CreatorWalletPageProps) {
 
     try {
       setIsLoadingBalance(true)
-      const updatedBalance = await mockApi.addToWallet(result.amount)
-      setBalance(updatedBalance.balance)
+      if (!creatorId) {
+        console.error("No creator ID available")
+        setPaymentResult(result)
+        setShowPaymentSuccess(true)
+        return
+      }
+
+      // Add funds to creator wallet using direct API call
+      const response = await fetch('/api/wallet/creator/balance', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          creatorId,
+          amount: result.amount,
+          operation: 'add_earnings'
+        })
+      })
+      
+      const updatedBalance = await response.json()
+      if (updatedBalance.balance) {
+        setWalletBalance(updatedBalance.balance)
+      }
+      
       setPaymentResult(result)
       setShowPaymentSuccess(true)
     } catch (error) {
@@ -137,6 +147,21 @@ export function CreatorWalletPage({ onBack }: CreatorWalletPageProps) {
       setShowPaymentSuccess(true)
     } finally {
       setIsLoadingBalance(false)
+    }
+  }
+
+  const refreshBalance = async () => {
+    try {
+      if (!creatorId) return
+      
+      const response = await fetch(`/api/wallet/creator/balance?creatorId=${creatorId}`)
+      const walletData = await response.json()
+      
+      if (walletData.balance) {
+        setWalletBalance(walletData.balance)
+      }
+    } catch (error) {
+      console.error("Failed to refresh balance:", error)
     }
   }
 
@@ -153,9 +178,28 @@ export function CreatorWalletPage({ onBack }: CreatorWalletPageProps) {
         return
       }
 
-      // Deduct the withdrawal amount from the creator wallet balance using MongoDB
-      const updatedBalance = await WalletApiService.updateCreatorWalletBalance(creatorId, result.amount, 'withdraw')
-      setBalance(updatedBalance.balance)
+      // Deduct the withdrawal amount from the creator wallet balance using direct API call
+      const response = await fetch('/api/wallet/creator/balance', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          creatorId,
+          amount: result.amount,
+          operation: 'withdraw'
+        })
+      })
+      
+      const updatedBalance = await response.json()
+      if (updatedBalance.balance) {
+        setWalletBalance(updatedBalance.balance)
+        console.log("Creator balance updated after withdrawal:", updatedBalance.balance)
+      } else if (updatedBalance.error === 'Insufficient total balance') {
+        alert("Insufficient total balance for withdrawal")
+        return
+      }
+      
       setWithdrawalResult(result)
       setShowWithdrawalSuccess(true)
     } catch (error) {
@@ -205,33 +249,47 @@ export function CreatorWalletPage({ onBack }: CreatorWalletPageProps) {
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12" />
           <CardContent className="p-6 sm:p-8 relative">
             <div className="flex items-center justify-between mb-8">
-              <div>
-                <p className="text-white/80 text-sm font-medium">Creator Balance</p>
-                <div className="flex items-center space-x-2">
+              <div className="flex-1">
+                <p className="text-white/80 text-sm font-medium">Wallet Balance</p>
+                <div className="space-y-2">
                   {isLoadingBalance ? (
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span className="text-lg">Loading...</span>
                     </div>
                   ) : showBalance ? (
-                    <p className="text-2xl font-bold">${balance?.toFixed(2) || '0.00'}</p>
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <p className="text-2xl font-bold">{walletBalance?.total?.toFixed(2) || '0.00'}</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowBalance(!showBalance)}
+                          className="p-1 text-white hover:bg-white/20"
+                          disabled={isLoadingBalance}
+                        >
+                          {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm">
+                        <div className="flex items-center space-x-1">
+                          <div className={`w-2 h-2 rounded-full ${TOKEN_DISPLAY.TK.bgColor.replace('bg-', 'bg-')}`}></div>
+                          <span className="text-white/80">{TOKEN_DISPLAY.TK.symbol}: {walletBalance?.tk?.toFixed(2) || '0.00'}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <div className={`w-2 h-2 rounded-full ${TOKEN_DISPLAY.TKI.bgColor.replace('bg-', 'bg-')}`}></div>
+                          <span className="text-white/80">{TOKEN_DISPLAY.TKI.symbol}: {walletBalance?.tki?.toFixed(2) || '0.00'}</span>
+                        </div>
+                      </div>
+                    </div>
                   ) : (
                     <p className="text-2xl font-bold">••••••</p>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowBalance(!showBalance)}
-                    className="p-1 text-white hover:bg-white/20"
-                    disabled={isLoadingBalance}
-                  >
-                    {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
                 </div>
               </div>
               <div className="flex items-center gap-2 bg-blue-300/30 rounded-full px-3 py-1.5">
                 <Star className="w-4 h-4" />
-                <span className="text-sm font-medium">Creator</span>
+                <span className="text-sm font-medium">Premium</span>
               </div>
             </div>
             
@@ -435,7 +493,7 @@ export function CreatorWalletPage({ onBack }: CreatorWalletPageProps) {
           onClose={() => setShowWithdrawalSelection(false)}
           onSuccess={handleWithdrawalSuccess}
           initialAmount={50}
-          currentBalance={balance}
+          currentBalance={walletBalance?.total}
         />
       )}
       {showWithdrawalSuccess && withdrawalResult && (
